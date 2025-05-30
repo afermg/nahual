@@ -1,0 +1,7 @@
+# Nahual: Deploy and access image and data processing models via TCP servers.
+
+This tool aims to provide a one-stop-shop source for multiple models to process imaging data or their derivatives. You can think of it as a much simpler [ollama](https://github.com/ollama/ollama) but for biological analyses, Deep learning or not.
+
+![logo](logo.svg)
+
+In Mesoamerican folklore, a Nahual is a sorcerer able to transform into different animals.
