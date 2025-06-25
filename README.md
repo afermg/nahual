@@ -10,7 +10,7 @@ By default, the models and tools are deployable using [Nix](https://nixos.org/).
 - [[https://github.com/afermg/baby][Baby]]: Segmentation, tracking and lineage assignment for budding yeast.
 
 ## WIP tools
-- [[https://github.com/weigertlab/trackastra][trackastra]]: Transformer-based models trained on a multitude of datasets.
+- [[https://github.com/afermg/trackastra][trackastra]]: Transformer-based models trained on a multitude of datasets.
 
 ## Minimal example for FastAPI-based server+client
 Any model requires a thin layer that communicates via an HTTP server (currently via [FastAPI](https://github.com/fastapi/fastapi), but in the future we may use [ucall](https://github.com/unum-cloud/ucall).
