@@ -13,7 +13,7 @@ By default, the models and tools are deployable using [Nix](https://nixos.org/).
 - [trackastra](https://github.com/afermg/trackastra): Transformer-based models trained on a multitude of datasets.
 
 ## Minimal example for FastAPI-based server+client
-Any model requires a thin layer that communicates via an HTTP server (currently via [FastAPI](https://github.com/fastapi/fastapi), but in the future we may use [ucall](https://github.com/unum-cloud/ucall).
+Any model requires a thin layer that communicates via an HTTP server (currently via [FastAPI](https://github.com/fastapi/fastapi) but in the future we may use [ucall](https://github.com/unum-cloud/ucall)).
 This is the server side
 ```python
 import numpy
