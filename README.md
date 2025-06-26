@@ -11,6 +11,7 @@ By default, the models and tools are deployable using [Nix](https://nixos.org/).
 
 ## WIP tools
 - [trackastra](https://github.com/afermg/trackastra): Transformer-based models trained on a multitude of datasets.
+- [DINOv2](https://github.com/afermg/dinov2): Generalistic self-supervised model to obtain visual features.
 
 ## Minimal example for FastAPI-based server+client
 Any model requires a thin layer that communicates via an HTTP server (currently via [FastAPI](https://github.com/fastapi/fastapi) but in the future we may use [ucall](https://github.com/unum-cloud/ucall)).
