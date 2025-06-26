@@ -57,5 +57,5 @@ print(orjson.loads(response.content))
 ## Why nahual?
 ![logo](logo.svg)
 
-In Mesoamerican folklore, a Nahual is a sorcerer able to transform into different animals.
+In Mesoamerican folklore, a Nahual is a shaman able to transform into different animals.
 
