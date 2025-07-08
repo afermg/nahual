@@ -1,4 +1,4 @@
-# Nahual: Deploy and access image and data processing models via HTTP.
+# Nahual: Deploy and access image and data processing models across environments/processes.
 
 Note that this is early work in progress.
 
@@ -14,7 +14,8 @@ By default, the models and tools are deployable using [Nix](https://nixos.org/).
 - [DINOv2](https://github.com/afermg/dinov2): Generalistic self-supervised model to obtain visual features.
 
 ## Minimal example for FastAPI-based server+client
-Any model requires a thin layer that communicates via an HTTP server (currently via [FastAPI](https://github.com/fastapi/fastapi) but in the future we may use [ucall](https://github.com/unum-cloud/ucall)).
+	Any model requires a thin layer that communicates using [[https://github.com/nanomsg/nng][nng]].
+	
 This is the server side
 ```python
 import numpy

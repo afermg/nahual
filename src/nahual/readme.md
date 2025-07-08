@@ -14,4 +14,7 @@ The models that are supported are:
   - trackastra
 - masks -> dictionary of labels (2D.int->dict of 1D.int)
   - Baby
-
+  
+## Options for web protocols
+- WebRTC
+- WebSockets
