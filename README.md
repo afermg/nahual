@@ -20,6 +20,8 @@ By default, the models and tools are deployable using [Nix](https://nixos.org/).
 - Support multiple instances of a model loaded on memory server-side.
 - Formalize supported packet formats: (e.g., numpy arrays, dictionary).
 - Increase number of supported models/methods.	
+- Document server-side API
+- Integrate into the [[github.com/afermg/aliby][aliby]] pipelining framework.
 
 ## Why nahual?
 ![logo](logo.svg)
