@@ -13,7 +13,7 @@ By default, the models and tools are deployable using [Nix](https://nixos.org/).
 - [Baby](https://github.com/afermg/baby): Segmentation, tracking and lineage assignment for budding yeast.
 - [DINOv2](https://github.com/afermg/dinov2): Generalistic self-supervised model to obtain visual features.
 
-## Minimal example for FastAPI-based server+client
+## Example of server+client
 	Any model requires a thin layer that communicates using [[https://github.com/nanomsg/nng][nng]]. You can see an example of trackastra's [[https://github.com/afermg/trackastra/blob/main/server.py][server]] and [[https://github.com/afermg/nahual/blob/master/src/nahual/clients/trackastra.py][client]].
 	
 ## Future goals

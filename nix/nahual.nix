@@ -6,10 +6,11 @@
   numpy,
   pynng,
   requests,
+  pytest,
 }:
 buildPythonPackage {
   pname = "nahual";
-  version = "0.0.1-unstable-2025-08-09";
+  version = "0.0.2-unstable-2025-08-09";
   format = "pyproject";
 
   src = ./..;
@@ -28,6 +29,7 @@ buildPythonPackage {
     numpy
     pynng
     requests
+    pytest
   ];
 
   pythonImportsCheck = [
