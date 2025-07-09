@@ -1,12 +1,12 @@
 [project]
 name = "nahual" 
-version = "0.0.1"
-description = "Deploy and access image and data processing models via HTTPS."
+version = "0.0.2"
+description = "Deploy and access image and data processing models across processes."
 authors = [{ name = "Alan Munoz" }]
-requires-python = ">=3.10,<3.13"
+requires-python = ">=3.9,<=3.13"
 readme = "README.md"
 dependencies = [
-  "numpy>=2.2.6",
+  "numpy<3",
   "pynng>=0.8.1",
   "requests",
 ]
@@ -27,7 +27,6 @@ dev = [
 test = [
     "imageio>=2.37.0",
     "matplotlib>=3.10.3",
-    "numpy>=2.2.6",
     "pytest>=8.4.0",
 ]
 
