@@ -12,12 +12,13 @@ buildPythonPackage {
   version = "0.0.1-unstable-2025-08-09";
   format = "pyproject";
 
-  src = fetchFromGitHub {
-    owner = "afermg";
-    repo = "nahual";
-    rev = "d9a809aa82ee5eef59fde05c0f6fca63f6b8b184";
-    sha256 = "sha256-QXDCLComdJj/6CTKMeF7nCzAIROhc27WXMi/QxGSU24=sha256-QXDCLComdJj/6CTKMeF7nCzAIROhc27WXMi/QxGSU24=";
-  };
+  src = ./..;
+  # src = fetchFromGitHub {
+  #   owner = "afermg";
+  #   repo = "nahual";
+  #   rev = "d9a809aa82ee5eef59fde05c0f6fca63f6b8b184";
+  #   sha256 = "sha256-QXDCLComdJj/6CTKMeF7nCzAIROhc27WXMi/QxGSU24=sha256-QXDCLComdJj/6CTKMeF7nCzAIROhc27WXMi/QxGSU24=";
+  # };
 
   build-system = [
     hatchling
