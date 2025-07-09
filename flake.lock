@@ -20,6 +20,27 @@
         "type": "github"
       }
     },
+    "flake-utils_2": {
+      "inputs": {
+        "systems": [
+          "pynng-flake",
+          "systems"
+        ]
+      },
+      "locked": {
+        "lastModified": 1731533236,
+        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1748929857,
@@ -27,6 +48,22 @@
         "owner": "NixOS",
         "repo": "nixpkgs",
         "rev": "c2a03962b8e24e669fb37b7df10e7c79531ff1a4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_2": {
+      "locked": {
+        "lastModified": 1750776420,
+        "narHash": "sha256-/CG+w0o0oJ5itVklOoLbdn2dGB0wbZVOoDm4np6w09A=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "30a61f056ac492e3b7cdcb69c1e6abdcf00e39cf",
         "type": "github"
       },
       "original": {
@@ -52,15 +89,68 @@
         "type": "github"
       }
     },
+    "nixpkgs_master_2": {
+      "locked": {
+        "lastModified": 1750996587,
+        "narHash": "sha256-TZX59sYtIj03+YlPYLOt+QRBojqSCSXHqiTrxSlQgQE=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "20ab4393953e79baf3eba360336a7e0619a0699f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "master",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "pynng-flake": {
+      "inputs": {
+        "flake-utils": "flake-utils_2",
+        "nixpkgs": "nixpkgs_2",
+        "nixpkgs_master": "nixpkgs_master_2",
+        "systems": "systems"
+      },
+      "locked": {
+        "lastModified": 1751902684,
+        "narHash": "sha256-mQzXg49chcEJQrNyZYgHKyoIirnwkWlE6ChjL2skRyg=",
+        "owner": "afermg",
+        "repo": "pynng",
+        "rev": "2ab123ab9cd38f2b01861502afdee4dad7a94b7f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "afermg",
+        "repo": "pynng",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs",
         "nixpkgs_master": "nixpkgs_master",
-        "systems": "systems"
+        "pynng-flake": "pynng-flake",
+        "systems": "systems_2"
       }
     },
     "systems": {
+      "locked": {
+        "lastModified": 1681028828,
+        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "repo": "default",
+        "type": "github"
+      }
+    },
+    "systems_2": {
       "locked": {
         "lastModified": 1681028828,
         "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",

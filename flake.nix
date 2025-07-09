@@ -5,6 +5,7 @@
     systems.url = "github:nix-systems/default";
     flake-utils.url = "github:numtide/flake-utils";
     flake-utils.inputs.systems.follows = "systems";
+    pynng-flake.url = "github:afermg/pynng";
   };
 
   outputs =
@@ -32,12 +33,17 @@
           ];
       in
       with pkgs;
-      {
+      rec {
+        packages = {
+          nahual = pkgs.python312.pkgs.callPackage ./nix/nahual.nix { };
+        };
         devShells = {
           default =
             let
               python_with_pkgs = pkgs.python3.withPackages (pp: [
                 # Add python pkgs here that you need from nix repos
+                (inputs.pynng-flake.packages.${system}.pynng)
+                packages.nahual
               ]);
             in
             mkShell {
