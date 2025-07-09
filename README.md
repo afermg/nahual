@@ -7,53 +7,19 @@ This tool aims to provide a one-stop-shop source for multiple models to process 
 ## Implemented tools 
 By default, the models and tools are deployable using [Nix](https://nixos.org/).
 
-- [Baby](https://github.com/afermg/baby): Segmentation, tracking and lineage assignment for budding yeast.
+- [trackastra](https://github.com/afermg/trackastra): Transformer-based models trained on a multitude of datasets.
 
 ## WIP tools
-- [trackastra](https://github.com/afermg/trackastra): Transformer-based models trained on a multitude of datasets.
+- [Baby](https://github.com/afermg/baby): Segmentation, tracking and lineage assignment for budding yeast.
 - [DINOv2](https://github.com/afermg/dinov2): Generalistic self-supervised model to obtain visual features.
 
 ## Minimal example for FastAPI-based server+client
-	Any model requires a thin layer that communicates using [[https://github.com/nanomsg/nng][nng]].
+	Any model requires a thin layer that communicates using [[https://github.com/nanomsg/nng][nng]]. You can see an example of trackastra's [[https://github.com/afermg/trackastra/blob/main/server.py][server]] and [[https://github.com/afermg/nahual/blob/master/src/nahual/clients/trackastra.py][client]].
 	
-This is the server side
-```python
-import numpy
-import orjson
-from fastapi import FastAPI, Request, Response
-
-app = FastAPI()
-
-@app.post("/process")
-async def process(request: Request):
-    # Convert list to numpy array
-    array = numpy.asarray(orjson.loads(await request.body()))
-    # Example processing, here is where processing is performed
-    result = array * 2
-    return Response(
-        orjson.dumps(result, option=orjson.OPT_SERIALIZE_NUMPY),
-    )
-```
-
-This is the client side
-```python
-import numpy
-import orjson
-import requests
-
-# Serialize a numpy array using orjson (faster json serialization)
-serial_numpy = orjson.dumps(
-    numpy.array([[1, 2], [3, 4]]),
-    option=orjson.OPT_SERIALIZE_NUMPY,
-)
-response = requests.post(
-    "http://localhost:8000/process",
-    serial_numpy,
-)
-print(orjson.loads(response.content))
-# [[2, 4], [6, 8]]
-
-```
+## Future goals
+- Support multiple instances of a model loaded on memory server-side.
+- Formalize supported packet formats: (e.g., numpy arrays, dictionary).
+- Increase number of supported models/methods.	
 
 ## Why nahual?
 ![logo](logo.svg)
