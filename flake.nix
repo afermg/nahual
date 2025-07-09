@@ -5,7 +5,6 @@
     systems.url = "github:nix-systems/default";
     flake-utils.url = "github:numtide/flake-utils";
     flake-utils.inputs.systems.follows = "systems";
-    pynng-flake.url = "github:afermg/pynng";
   };
 
   outputs =
@@ -28,21 +27,18 @@
             # Add needed packages here
             pkgs.libz # Numpy
             pkgs.stdenv.cc.cc
-            # pkgs.libGL
-            # pkgs.glib
           ];
       in
       with pkgs;
       rec {
         packages = {
-          nahual = pkgs.python312.pkgs.callPackage ./nix/nahual.nix { };
+          nahual = pkgs.python3.pkgs.callPackage ./nix/nahual.nix { };
         };
         devShells = {
           default =
             let
               python_with_pkgs = pkgs.python3.withPackages (pp: [
                 # Add python pkgs here that you need from nix repos
-                (inputs.pynng-flake.packages.${system}.pynng)
                 packages.nahual
               ]);
             in
@@ -70,8 +66,3 @@
       }
     );
 }
-# Things one might need for debugging or adding compatibility
-# export CUDA_PATH=${pkgs.cudaPackages.cudatoolkit}
-# export LD_LIBRARY_PATH=${pkgs.cudaPackages.cuda_nvrtc}/lib
-# export EXTRA_LDFLAGS="-L/lib -L${pkgs.linuxPackages.nvidia_x11}/lib"
-# export EXTRA_CCFLAGS="-I/usr/include"

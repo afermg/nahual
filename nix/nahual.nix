@@ -4,16 +4,19 @@
   fetchFromGitHub,
   # setuptools,
   numpy,
+  hatchling,
+  requests,
+  pynng,
 }:
 buildPythonPackage {
-  pname = "pynng";
+  pname = "nahual";
   version = "0.0.1-unstable-2025-08-09";
   format = "pyproject";
 
   src = fetchFromGitHub {
     owner = "afermg";
     repo = "nahual";
-    rev = "2179328f8a858bbb3e177f66ac132bde4a5aa859";
+    rev = "";
     sha256 = "";
   };
 
@@ -21,12 +24,13 @@ buildPythonPackage {
   ];
 
   build-system = [
-    # setuptools
+    hatchling
   ];
 
   dependencies = [
     numpy
-    # pynng
+    pynng
+    requests
   ];
 
   pythonImportsCheck = [
