@@ -6,7 +6,9 @@ authors = [{ name = "Alan Munoz" }]
 requires-python = ">=3.10,<3.13"
 readme = "README.md"
 dependencies = [
-  "requests"
+  "numpy>=2.2.6",
+  "pynng>=0.8.1",
+  "requests",
 ]
 
 [project.urls]
@@ -20,8 +22,11 @@ dev = [
     "jupyter>=1.1.1",
     "jupytext>=1.17.2",
     "ruff>=0.1.15",
+    "ruff-lsp>=0.0.62",
 ]
 test = [
+    "imageio>=2.37.0",
+    "matplotlib>=3.10.3",
     "numpy>=2.2.6",
     "pytest>=8.4.0",
 ]
