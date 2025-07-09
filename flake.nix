@@ -31,9 +31,7 @@
       in
       with pkgs;
       rec {
-        packages = {
-          nahual = pkgs.python3.pkgs.callPackage ./nix/nahual.nix { };
-        };
+        packages = pkgs.callPackage ./nix { };
         devShells = {
           default =
             let
