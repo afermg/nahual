@@ -1,7 +1,7 @@
 [project]
 name = "nahual" 
 version = "0.0.1"
-description = "Deploy and access image and data processing models via HTTPS."
+description = "Deploy and access image and data processing models across processes."
 authors = [{ name = "Alan Munoz" }]
 requires-python = ">=3.10,<3.13"
 readme = "README.md"
