@@ -2,11 +2,10 @@
   lib,
   buildPythonPackage,
   fetchFromGitHub,
-  # setuptools,
-  numpy,
   hatchling,
-  requests,
+  numpy,
   pynng,
+  requests,
 }:
 buildPythonPackage {
   pname = "nahual";
@@ -16,12 +15,9 @@ buildPythonPackage {
   src = fetchFromGitHub {
     owner = "afermg";
     repo = "nahual";
-    rev = "";
-    sha256 = "";
+    rev = "302a00c61b989f20553681d0edc3130e8691e222";
+    sha256 = "sha256-RTi05oUB4QmFRw9ZgUseelAN//lhHTJWTNUqPocNa4M=sha256-RTi05oUB4QmFRw9ZgUseelAN//lhHTJWTNUqPocNa4M=";
   };
-
-  nativeBuildInputs = [
-  ];
 
   build-system = [
     hatchling
@@ -34,7 +30,7 @@ buildPythonPackage {
   ];
 
   pythonImportsCheck = [
-    "pynng"
+    "nahual"
   ];
 
   meta = {
