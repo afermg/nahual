@@ -50,7 +50,7 @@ You can press `C-c C-c` from the terminal where the server lives to kill it. We 
 - Formalize supported packet formats: (e.g., numpy arrays, dictionary).
 - Increase number of supported models/methods.	
 - Document server-side API.
-- Integrate into the [[github.com/afermg/aliby][aliby]] pipelining framework.
+- Integrate into the [github.com/afermg/aliby](aliby) pipelining framework.
 - Support containers that wrap the Nix derivations.
 
 ## Why nahual?
