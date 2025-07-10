@@ -24,9 +24,26 @@ git clone https://github.com/afermg/dinov2.git
 cd dinov2
 nix develop --command bash -c "python server.py ipc:///tmp/example_name.ipc"
 ```
-
 ### Step 2: Run client
 Once the server is running, you can call it from a different python script.
+```python
+import numpy
+
+from nahual.clients.dinov2 import load_model, process_data
+
+address = "ipc:///tmp/example_name.ipc"
+
+# Load models server-side
+parameters = {"repo_or_dir": "facebookresearch/dinov2", "model": "dinov2_vits14_lc"}
+load_model(parameters, address=address)
+
+# Define custom data
+data = numpy.random.random_sample((1, 3, 420, 420))
+result = process_data(data, address=address)
+```
+
+You can press `C-c C-c` from the terminal where the server lives to kill it. We will also add a way to kill the server from within the client.
+
 ## Future goals
 - Support multiple instances of a model loaded on memory server-side.
 - Formalize supported packet formats: (e.g., numpy arrays, dictionary).
