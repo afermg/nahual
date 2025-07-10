@@ -8,13 +8,14 @@ This tool aims to provide a one-stop-shop source for multiple models to process 
 By default, the models and tools are deployable using [Nix](https://nixos.org/).
 
 - [trackastra](https://github.com/afermg/trackastra): Transformer-based models trained on a multitude of datasets.
+- [DINOv2](https://github.com/afermg/dinov2): Generalistic self-supervised model to obtain visual features.
 
 ## WIP tools
 - [Baby](https://github.com/afermg/baby): Segmentation, tracking and lineage assignment for budding yeast.
-- [DINOv2](https://github.com/afermg/dinov2): Generalistic self-supervised model to obtain visual features.
+- Other models and methods (to be defined)
 
 ## Example of server+client
-	Any model requires a thin layer that communicates using [[https://github.com/nanomsg/nng][nng]]. You can see an example of trackastra's [[https://github.com/afermg/trackastra/blob/main/server.py][server]] and [[https://github.com/afermg/nahual/blob/master/src/nahual/clients/trackastra.py][client]].
+	Any model requires a thin layer that communicates using [[https://github.com/nanomsg/nng][nng]]. You can see an example of trackastra's [[https://github.com/afermg/trackastra/blob/main/server.py][server]] and [[https://github.com/afermg/nahual/blob/master/src/nahual.client/trackastra.py][client]].
 	
 ## Usage
 ### Step 1: Deploy server
@@ -29,7 +30,7 @@ Once the server is running, you can call it from a different python script.
 ```python
 import numpy
 
-from nahual.clients.dinov2 import load_model, process_data
+from nahual.client.dinov2 import load_model, process_data
 
 address = "ipc:///tmp/example_name.ipc"
 

@@ -6,7 +6,7 @@ Run `nix develop --command bash -c "python server.py ipc:///tmp/example_name.ipc
 
 import numpy
 
-from nahual.clients.dinov2 import load_model, process_data
+from nahual.client.dinov2 import load_model, process_data
 
 address = "ipc:///tmp/example_name.ipc"
 
