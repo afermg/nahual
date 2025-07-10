@@ -43,7 +43,7 @@ result = process_data(data, address=address)
 You can press `C-c C-c` from the terminal where the server lives to kill it. We will also add a way to kill the server from within the client.
 
 ## Adding support for new models
-	Any model requires a thin layer that communicates using [https://github.com/nanomsg/nng](nng). You can see an example of trackastra's [https://github.com/afermg/trackastra/blob/main/server.py](server) and [https://github.com/afermg/nahual/blob/master/src/nahual.client/trackastra.py](client).
+Any model requires a thin layer that communicates using [https://github.com/nanomsg/nng](nng). You can see an example of trackastra's [https://github.com/afermg/trackastra/blob/main/server.py](server) and [https://github.com/afermg/nahual/blob/master/src/nahual.client/trackastra.py](client).
 	
 ## Roadmap
 - Support multiple instances of a model loaded on memory server-side.
