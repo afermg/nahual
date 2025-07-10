@@ -16,12 +16,24 @@ By default, the models and tools are deployable using [Nix](https://nixos.org/).
 ## Example of server+client
 	Any model requires a thin layer that communicates using [[https://github.com/nanomsg/nng][nng]]. You can see an example of trackastra's [[https://github.com/afermg/trackastra/blob/main/server.py][server]] and [[https://github.com/afermg/nahual/blob/master/src/nahual/clients/trackastra.py][client]].
 	
+## Usage
+### Step 1: Deploy server
+`cd` to the model you want to deploy. In this case we will test the image embedding model DINOv2.
+```bash
+git clone https://github.com/afermg/dinov2.git
+cd dinov2
+nix develop --command bash -c "python server.py ipc:///tmp/example_name.ipc"
+```
+
+### Step 2: Run client
+Once the server is running, you can call it from a different python script.
 ## Future goals
 - Support multiple instances of a model loaded on memory server-side.
 - Formalize supported packet formats: (e.g., numpy arrays, dictionary).
 - Increase number of supported models/methods.	
-- Document server-side API
+- Document server-side API.
 - Integrate into the [[github.com/afermg/aliby][aliby]] pipelining framework.
+- Support containers that wrap the Nix derivations.
 
 ## Why nahual?
 ![logo](logo.svg)

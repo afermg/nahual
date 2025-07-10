@@ -5,15 +5,20 @@ This functions define how Nahual's trackastra client contacts its server counter
 """
 
 import json
+import sys
 
 import numpy
 
-from nahual.serial import serialize_numpy
+from nahual.serial import deserialize_numpy, serialize_numpy
 from nahual.transport import request_receive
 
 
 def load_model(
-    parameters: dict = {"model": "general_2d", "mode": "greedy"}, address: str = None
+    parameters: dict = {
+        "repo_or_dir": "facebookresearch/dinov2",
+        "model": "dinov2_vits14_lc",
+    },
+    address: str = None,
 ) -> str:
     """
     Load a model by sending parameters to a specified address.
@@ -21,9 +26,9 @@ def load_model(
     Parameters:
     -----------
     parameters : dict, optional
-        A dictionary containing model parameters. Defaults to {"model_name": "general_2d"}.
-    address : str
-        The address to send the request.
+        A dictionary containing model parameters.
+    address : str, optional
+        The address to send the request. Defaults to ADDRESS.
 
     Returns:
     --------
@@ -49,8 +54,8 @@ def process_data(data: list | numpy.ndarray, address: str = None) -> dict:
     -----------
     data : list or numpy.ndarray
         The input data to process.
-    address : str
-        The address to send the request.
+    address : str, optional
+        The address to send the request. Defaults to ADDRESS.
 
     Returns:
     --------
@@ -64,7 +69,7 @@ def process_data(data: list | numpy.ndarray, address: str = None) -> dict:
     # Request->receive
     response = request_receive(packet, address=address)
     # decode
-    decoded = json.loads(response.decode())
-    print(f"REQ: RECEIVED PROCESSED DATA {len(decoded), decoded.keys()}")
+    decoded = deserialize_numpy(response)
+    print(f"REQ: RECEIVED PROCESSED DATA {decoded.shape, decoded.dtype}")
 
     return decoded
