@@ -14,9 +14,6 @@ By default, the models and tools are deployable using [Nix](https://nixos.org/).
 - [Baby](https://github.com/afermg/baby): Segmentation, tracking and lineage assignment for budding yeast.
 - Other models and methods (to be defined)
 
-## Example of server+client
-	Any model requires a thin layer that communicates using [[https://github.com/nanomsg/nng][nng]]. You can see an example of trackastra's [[https://github.com/afermg/trackastra/blob/main/server.py][server]] and [[https://github.com/afermg/nahual/blob/master/src/nahual.client/trackastra.py][client]].
-	
 ## Usage
 ### Step 1: Deploy server
 `cd` to the model you want to deploy. In this case we will test the image embedding model DINOv2.
@@ -45,7 +42,10 @@ result = process_data(data, address=address)
 
 You can press `C-c C-c` from the terminal where the server lives to kill it. We will also add a way to kill the server from within the client.
 
-## Future goals
+## Adding support for new models
+	Any model requires a thin layer that communicates using [https://github.com/nanomsg/nng](nng). You can see an example of trackastra's [https://github.com/afermg/trackastra/blob/main/server.py](server) and [https://github.com/afermg/nahual/blob/master/src/nahual.client/trackastra.py](client).
+	
+## Roadmap
 - Support multiple instances of a model loaded on memory server-side.
 - Formalize supported packet formats: (e.g., numpy arrays, dictionary).
 - Increase number of supported models/methods.	
