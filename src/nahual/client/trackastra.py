@@ -11,11 +11,9 @@ import numpy
 from nahual.serial import serialize_numpy
 from nahual.transport import request_receive
 
-ADDRESS = "ipc:///tmp/reqrep.ipc"
-
 
 def load_model(
-    parameters: dict = {"model_name": "general_2d"}, address: str = ADDRESS
+    parameters: dict = {"model": "general_2d", "mode": "greedy"}, address: str = None
 ) -> str:
     """
     Load a model by sending parameters to a specified address.
@@ -24,8 +22,8 @@ def load_model(
     -----------
     parameters : dict, optional
         A dictionary containing model parameters. Defaults to {"model_name": "general_2d"}.
-    address : str, optional
-        The address to send the request. Defaults to ADDRESS.
+    address : str
+        The address to send the request.
 
     Returns:
     --------
@@ -43,7 +41,7 @@ def load_model(
     return json.loads(decoded)
 
 
-def process_data(data: list | numpy.ndarray, address: str = ADDRESS) -> dict:
+def process_data(data: list | numpy.ndarray, address: str = None) -> dict:
     """
     Process data by sending it to a specified address.
 
@@ -51,8 +49,8 @@ def process_data(data: list | numpy.ndarray, address: str = ADDRESS) -> dict:
     -----------
     data : list or numpy.ndarray
         The input data to process.
-    address : str, optional
-        The address to send the request. Defaults to ADDRESS.
+    address : str
+        The address to send the request.
 
     Returns:
     --------

@@ -8,20 +8,50 @@ This tool aims to provide a one-stop-shop source for multiple models to process 
 By default, the models and tools are deployable using [Nix](https://nixos.org/).
 
 - [trackastra](https://github.com/afermg/trackastra): Transformer-based models trained on a multitude of datasets.
+- [DINOv2](https://github.com/afermg/dinov2): Generalistic self-supervised model to obtain visual features.
 
 ## WIP tools
 - [Baby](https://github.com/afermg/baby): Segmentation, tracking and lineage assignment for budding yeast.
-- [DINOv2](https://github.com/afermg/dinov2): Generalistic self-supervised model to obtain visual features.
+- Other models and methods (to be defined)
 
-## Minimal example for FastAPI-based server+client
-	Any model requires a thin layer that communicates using [[https://github.com/nanomsg/nng][nng]]. You can see an example of trackastra's [[https://github.com/afermg/trackastra/blob/main/server.py][server]] and [[https://github.com/afermg/nahual/blob/master/src/nahual/clients/trackastra.py][client]].
+## Example of server+client
+	Any model requires a thin layer that communicates using [[https://github.com/nanomsg/nng][nng]]. You can see an example of trackastra's [[https://github.com/afermg/trackastra/blob/main/server.py][server]] and [[https://github.com/afermg/nahual/blob/master/src/nahual.client/trackastra.py][client]].
 	
+## Usage
+### Step 1: Deploy server
+`cd` to the model you want to deploy. In this case we will test the image embedding model DINOv2.
+```bash
+git clone https://github.com/afermg/dinov2.git
+cd dinov2
+nix develop --command bash -c "python server.py ipc:///tmp/example_name.ipc"
+```
+### Step 2: Run client
+Once the server is running, you can call it from a different python script.
+```python
+import numpy
+
+from nahual.client.dinov2 import load_model, process_data
+
+address = "ipc:///tmp/example_name.ipc"
+
+# Load models server-side
+parameters = {"repo_or_dir": "facebookresearch/dinov2", "model": "dinov2_vits14_lc"}
+load_model(parameters, address=address)
+
+# Define custom data
+data = numpy.random.random_sample((1, 3, 420, 420))
+result = process_data(data, address=address)
+```
+
+You can press `C-c C-c` from the terminal where the server lives to kill it. We will also add a way to kill the server from within the client.
+
 ## Future goals
 - Support multiple instances of a model loaded on memory server-side.
 - Formalize supported packet formats: (e.g., numpy arrays, dictionary).
 - Increase number of supported models/methods.	
-- Document server-side API
+- Document server-side API.
 - Integrate into the [[github.com/afermg/aliby][aliby]] pipelining framework.
+- Support containers that wrap the Nix derivations.
 
 ## Why nahual?
 ![logo](logo.svg)
