@@ -43,14 +43,14 @@ result = process_data(data, address=address)
 You can press `C-c C-c` from the terminal where the server lives to kill it. We will also add a way to kill the server from within the client.
 
 ## Adding support for new models
-Any model requires a thin layer that communicates using [https://github.com/nanomsg/nng](nng). You can see an example of trackastra's [https://github.com/afermg/trackastra/blob/main/server.py](server) and [https://github.com/afermg/nahual/blob/master/src/nahual.client/trackastra.py](client).
+Any model requires a thin layer that communicates using [https://github.com/nanomsg/nng](nng). You can see an example of trackastra's [server](https://github.com/afermg/trackastra/blob/main/server.py) and [client](https://github.com/afermg/nahual/blob/master/src/nahual.client/trackastra.py).
 	
 ## Roadmap
 - Support multiple instances of a model loaded on memory server-side.
 - Formalize supported packet formats: (e.g., numpy arrays, dictionary).
 - Increase number of supported models/methods.	
 - Document server-side API.
-- Integrate into the [github.com/afermg/aliby](aliby) pipelining framework.
+- Integrate into the [aliby](github.com/afermg/aliby) pipelining framework.
 - Support containers that wrap the Nix derivations.
 
 ## Why nahual?
