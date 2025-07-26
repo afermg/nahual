@@ -27,7 +27,7 @@ def serialize_numpy(data: numpy.ndarray) -> bytes:
     """
     array_bytes = data.tobytes()
     dtype_char = data.dtype.char.encode()
-    ndim = data.ndim.to_bytes()
+    ndim = data.ndim.to_bytes(length=1, byteorder="big")
     shape = data.shape
 
     shape = bytes()
