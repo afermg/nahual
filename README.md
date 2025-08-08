@@ -1,3 +1,7 @@
+<div align="center">
+<img src="./logo.svg" width="150px">
+</div>
+
 # Nahual: Deploy and access image and data processing models across environments/processes.
 
 Note that this is early work in progress.
@@ -54,7 +58,5 @@ Any model requires a thin layer that communicates using [nng](https://github.com
 - Support containers that wrap the Nix derivations.
 
 ## Why nahual?
-![logo](logo.svg)
-
 In Mesoamerican folklore, a Nahual is a shaman able to transform into different animals.
 
