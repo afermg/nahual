@@ -13,10 +13,11 @@ By default, the models and tools are deployable using [Nix](https://nixos.org/).
 
 - [trackastra](https://github.com/afermg/trackastra): Transformer-based models trained on a multitude of datasets.
 - [DINOv2](https://github.com/afermg/dinov2): Generalistic self-supervised model to obtain visual features.
-
-## WIP tools
 - [Baby](https://github.com/afermg/baby): Segmentation, tracking and lineage assignment for budding yeast.
+
+## WIP and Roadmap
 - Other models and methods (to be defined)
+- Add container-based deployment to wrap nix
 
 ## Usage
 ### Step 1: Deploy server
