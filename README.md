@@ -15,10 +15,6 @@ By default, the models and tools are deployable using [Nix](https://nixos.org/).
 - [DINOv2](https://github.com/afermg/dinov2): Generalistic self-supervised model to obtain visual features.
 - [Baby](https://github.com/afermg/baby): Segmentation, tracking and lineage assignment for budding yeast.
 
-## WIP and Roadmap
-- Other models and methods (to be defined)
-- Add container-based deployment to wrap nix
-
 ## Usage
 ### Step 1: Deploy server
 `cd` to the model you want to deploy. In this case we will test the image embedding model DINOv2.
