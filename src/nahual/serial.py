@@ -61,7 +61,7 @@ def deserialize_numpy(message: bytes) -> numpy.ndarray:
     # First byte: dtype char
     in_dtype = numpy.dtype(message[:1].decode())
     # Second byte: ndim
-    in_ndim = int.from_bytes(message[1:2])
+    in_ndim = int.from_bytes(message[1:2], byteorder="big")
     # Third->n: shape
     in_shape = tuple(
         chain.from_iterable([
