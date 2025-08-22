@@ -38,6 +38,7 @@ async def responder(sock: Socket, setup: Callable, processor: Callable = None):
     """
 
     while True:
+        stage = "Model loading"
         try:
             msg = await sock.arecv_msg()
 
@@ -46,7 +47,6 @@ async def responder(sock: Socket, setup: Callable, processor: Callable = None):
                 break
 
             if processor is None:
-                stage = "Model loading"
                 processor = await setup_content(msg, sock, setup)
             else:
                 stage = "Data processing"
