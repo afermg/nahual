@@ -64,9 +64,12 @@ def deserialize_numpy(message: bytes) -> numpy.ndarray:
     in_ndim = int.from_bytes(message[1:2], byteorder="big")
     # Third->n: shape
     in_shape = tuple(
-        chain.from_iterable([
-            struct.unpack(">H", message[i * 2 + 2 : i * 2 + 4]) for i in range(in_ndim)
-        ])
+        chain.from_iterable(
+            [
+                struct.unpack(">H", message[i * 2 + 2 : i * 2 + 4])
+                for i in range(in_ndim)
+            ]
+        )
     )
 
     reshaped_array = numpy.frombuffer(

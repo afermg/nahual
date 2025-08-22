@@ -9,7 +9,7 @@ import numpy
 from nahual.process import dispatch_setup_process
 
 setup, process = dispatch_setup_process("dinov2")
-address = "ipc:///tmp/cellpose.ipc"
+address = "ipc:///tmp/dinov2.ipc"
 i = 0
 
 # %%Load models server-side
