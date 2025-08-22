@@ -29,7 +29,7 @@ def request_receive(packet: bytes, address: str) -> bytes:
     """
     with pynng.Req0() as sock:
         sock.dial(address)
-        print(f"REQ: SENDING {len(packet)} bytes")
+        print(f"REQ: SENDING {len(packet)} bytes to {address}")
         sock.send(packet)
         response = sock.recv_msg()
         response_bytes = response.bytes
