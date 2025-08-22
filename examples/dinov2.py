@@ -24,4 +24,3 @@ result = process(data + 1000, address=address)
 print(result[:10, :10])
 if result is not None:
     prev = result.copy()
-# %%

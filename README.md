@@ -8,24 +8,27 @@ Note that this is early work in progress.
 
 This tool aims to provide a one-stop-shop source for multiple models to process imaging data or their derivatives. You can think of it as a much simpler [ollama](https://github.com/ollama/ollama) but for biological analyses, deep learning-based or otherwise.
 
-## Implemented tools 
+## Implemented models and tools 
 By default, the models and tools are deployable using [Nix](https://nixos.org/).
 
 - [trackastra](https://github.com/afermg/trackastra): Transformer-based models trained on a multitude of datasets.
-- [DINOv2](https://github.com/afermg/dinov2): Generalistic self-supervised model to obtain visual features.
-- [Baby](https://github.com/afermg/baby): Segmentation, tracking and lineage assignment for budding yeast.
+- [DINOv2](https://github.com/afermg/dinov2): Generalist self-supervised model to obtain visual features.
+- [BABY](https://github.com/afermg/baby): Segmentation, tracking and lineage assignment for budding yeast.
+- [cellpose](https://github.com/afermg/cellpose): Generalist segmentation model.
 
 ## WIP
-- [cellpose](https://github.com/afermg/trackastra): Generalist segmentation model.
+- [DINOv3](https://github.com/afermg/dinov3): Generalist self-supervised model, latest iteration.
 
 ## Usage
 ### Step 1: Deploy server
 `cd` to the model you want to deploy. In this case we will test the image embedding model DINOv2.
+
 ```bash
 git clone https://github.com/afermg/dinov2.git
 cd dinov2
-nix develop --command bash -c "python server.py ipc:///tmp/example_name.ipc"
+nix develop --command bash -c "python server.py ipc:///tmp/dinov2.ipc"
 ```
+
 ### Step 2: Run client
 Once the server is running, you can call it from a different python script.
 ```python

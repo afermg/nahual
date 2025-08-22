@@ -53,7 +53,7 @@ async def responder(sock: Socket, setup: Callable, processor: Callable = None):
                 await process_content(msg, sock, processor)
 
         except Timeout as e:
-            print(f"Waiting for parameters: {e}")
+            print(f"Waiting for {stage.split(' ')[0]}: {e}")
             time.sleep(1)
         except Exception as e:
             print(f"{stage} failed: {e}")

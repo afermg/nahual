@@ -1,5 +1,7 @@
 """
 This client matches baby-phone's API (https://github.com/afermg/baby). Run baby phone using `baby-phone` on the CLI.
+
+Note that this example is quite different from the rest, due to legacy code reasons.
 """
 
 import numpy
