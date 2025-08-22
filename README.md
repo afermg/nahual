@@ -11,10 +11,10 @@ This tool aims to provide a one-stop-shop source for multiple models to process 
 ## Implemented models and tools 
 By default, the models and tools are deployable using [Nix](https://nixos.org/).
 
-- [trackastra](https://github.com/afermg/trackastra): Transformer-based models trained on a multitude of datasets.
-- [DINOv2](https://github.com/afermg/dinov2): Generalist self-supervised model to obtain visual features.
 - [BABY](https://github.com/afermg/baby): Segmentation, tracking and lineage assignment for budding yeast.
-- [cellpose](https://github.com/afermg/cellpose): Generalist segmentation model.
+- [Cellpose](https://github.com/afermg/cellpose): Generalist segmentation model.
+- [DINOv2](https://github.com/afermg/dinov2): Generalist self-supervised model to obtain visual features.
+- [Trackastra](https://github.com/afermg/trackastra): Transformer-based models trained on a multitude of datasets.
 
 ## WIP
 - [DINOv3](https://github.com/afermg/dinov3): Generalist self-supervised model, latest iteration.
