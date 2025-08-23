@@ -36,17 +36,18 @@ Once the server is running, you can call it from a different python script.
 ```python
 import numpy
 
-from nahual.client.dinov2 import load_model, process_data
+from nahual.process import dispatch_setup_process
 
-address = "ipc:///tmp/example_name.ipc"
+setup, process = dispatch_setup_process("dinov2")
+address = "ipc:///tmp/dinov2.ipc"
 
-# Load models server-side
+# %%Load models server-side
 parameters = {"repo_or_dir": "facebookresearch/dinov2", "model": "dinov2_vits14_lc"}
-load_model(parameters, address=address)
+response = setup(parameters, address=address)
 
-# Define custom data
+# %% Define custom data
 data = numpy.random.random_sample((1, 3, 420, 420))
-result = process_data(data, address=address)
+result = process(data + 1000, address=address)
 ```
 
 You can press `C-c C-c` from the terminal where the server lives to kill it. We will also add a way to kill the server from within the client.
