@@ -1,6 +1,6 @@
 [project]
 name = "nahual" 
-version = "0.0.4"
+version = "0.0.5"
 description = "Deploy and access image and data processing models across processes."
 authors = [{ name = "Alan Munoz" }]
 requires-python = ">=3.9,<=3.13"
@@ -26,7 +26,6 @@ dev = [
 ]
 test = [
     "imageio>=2.37.0",
-    "matplotlib>=3.10.3",
     "pytest>=8.4.0",
 ]
 
