@@ -2,19 +2,38 @@
 <img src="./logo.svg" width="150px">
 </div>
 
-# Nahual: Deploy and access image and data processing models across environments/processes.
+# Nahual: Deploy and use models to process across environments/processes.
 
-Note that this is early work in progress.
+The problem: When trying to train, compare and deploy many different models (deep learning or otherwise), the number of dependencies in one Python environment can get out of control very quickly (e.g., one model requires PyTorch 2.1 and another one 2.7). 
 
-This tool aims to provide a one-stop-shop source for multiple models to process imaging data or their derivatives. You can think of it as a much simpler [ollama](https://github.com/ollama/ollama) but for biological analyses, deep learning-based or otherwise.
+Potential solution: I figured that if we can move parameters and numpy arrays between environments, we can isoleate each model and having them process our data on-demand. 
 
-## Implemented models and tools 
+Thus the goal of this tool is provide a way to deploy model(s) in one (on multiple) environments, and access them from a different one.
+
+## Design decisions and details
+I strive to be as lean as possible (both in dependency count and architectural complexity), it is designed around three layers:
+
+- Server deployment: A collection of functions/tool (we could even call it a "model zoo" if we are trying to sound cool) that we may want to use, (e.g., Cellpose for object segmentation or Trackastra for tracking).
+- Transport layer: We need to move the data between environments. I also wrote my own (trivially simple) numpy serializer. Since we have Python at both ends of the connection, we can reuse these functions server-side.
+- Orchestration: This can be a script, or my own pipelining framework [aliby](https://github.com/afermg/aliby), massages the data into the desired shape/type, and then hands it over to =nahual=.
+
+This tool is my personal one-stop-shop source for multiple models to process imaging data or their derivatives. Please note that this is work in progress, and very likely to undergo major changes as I understand the core challenges.
+
+To reduce maintenance burden, we support only the necessary data types:
+- Dictionaries: To send parameters to deploy and evaluate models/functions.
+- Numpy arrays (and numpy-able lists/tuples): The main type of data we deal with.
+
+### Tech stack 
+- Model/tool deployment I use [Nix](https://nixos.org/), and at the moment do not plan to support containers. The logic behind  gives me unique guarantees of reproducibility, whilst allowing me to use bleeding edge models and libraries.
+- Transport layer I use [pynng](github.com/codypiersall/pynng), I like that it is very minimalistic, provides a subset, . An alternative would have been `gRPC` + `protobuf`, but since I am trying to understand the constraints and tradeoffs I do not want to commit to a big framework unless I have a compelling reason to do so.
+
+## Available models and tools 
 By default, the models and tools are deployable using [Nix](https://nixos.org/).
 
 - [BABY](https://github.com/afermg/baby): Segmentation, tracking and lineage assignment for budding yeast.
 - [Cellpose](https://github.com/afermg/cellpose): Generalist segmentation model.
 - [DINOv2](https://github.com/afermg/dinov2): Generalist self-supervised model to obtain visual features.
-- [Trackastra](https://github.com/afermg/trackastra): Transformer-based models trained on a multitude of datasets.
+- [Trackastra](https://github.com/afermg/trackastra): Transformer-based tracking trained on a multitude of datasets.
 
 ## WIP
 - [DINOv3](https://github.com/afermg/dinov3): Generalist self-supervised model, latest iteration.
