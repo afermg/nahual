@@ -22,12 +22,11 @@
           config.allowUnfree = true;
         };
 
-        libList =
-          [
-            # Add needed packages here
-            pkgs.libz # Numpy
-            pkgs.stdenv.cc.cc
-          ];
+        libList = [
+          # Add needed packages here
+          pkgs.zlib # Numpy
+          pkgs.stdenv.cc.cc
+        ];
       in
       with pkgs;
       rec {
@@ -44,7 +43,7 @@
               NIX_LD_LIBRARY_PATH = lib.makeLibraryPath libList;
               packages = [
                 python_with_pkgs
-                python3Packages.venvShellHook
+                # python3Packages.venvShellHook
                 pkgs.uv
               ] ++ libList;
               venvDir = "./.venv";
@@ -55,12 +54,14 @@
                 unset SOURCE_DATE_EPOCH
               '';
               shellHook = ''
-                runHook venvShellHook
                 export LD_LIBRARY_PATH=$NIX_LD_LIBRARY_PATH:$LD_LIBRARY_PATH
-                export PYTHONPATH=${python_with_pkgs}/${python_with_pkgs.sitePackages}:$PYTHONPATH
+                uv sync
+                source .venv/bin/activate
               '';
             };
         };
       }
     );
 }
+# runHook venvShellHook # This runs nix python
+# export PYTHONPATH=${python_with_pkgs}/${python_with_pkgs.sitePackages}:$PYTHONPATH
