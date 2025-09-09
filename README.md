@@ -70,7 +70,7 @@ To reduce maintenance burden, we support only the necessary data types:
 - Transport layer I use [pynng](github.com/codypiersall/pynng), I like that it is very minimalistic, provides a subset, . An alternative would have been `gRPC` + `protobuf`, but since I am trying to understand the constraints and tradeoffs I do not want to commit to a big framework unless I have a compelling reason to do so.
 
 ## Adding support for new models
-Any model requires a thin layer that communicates using [nng](https://github.com/nanomsg/nng). You can see an example of trackastra's [server](https://github.com/afermg/trackastra/blob/main/server.py) and [client](https://github.com/afermg/nahual/blob/master/src/nahual.client/trackastra.py).
+Any model requires a thin layer that communicates using [nng](https://github.com/nanomsg/nng). You can see an example of trackastra's [server](https://github.com/afermg/trackastra/blob/main/server.py) and [client](./examples/trackastra.py).
 	
 ## Roadmap
 - Support multiple instances of a model loaded on memory server-side.
