@@ -37,14 +37,14 @@ async def responder(sock: Socket, setup: Callable, processor: Callable = None):
         - The 'process' function is used to compute results from input data.
     """
 
+    stage = "Model loading"
     while True:
-        stage = "Model loading"
         try:
             msg = await sock.arecv_msg()
 
-            if len(msg.bytes) == 1:
-                print("Exiting")
-                break
+            # if len(msg.bytes) == 1:
+            #     print("Exiting")
+            #     break
 
             if processor is None:
                 processor = await setup_content(msg, sock, setup)
