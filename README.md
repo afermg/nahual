@@ -77,7 +77,7 @@ Any model requires a thin layer that communicates using [nng](https://github.com
 - Formalize supported packet formats: (e.g., numpy arrays, dictionary).
 - Increase number of supported models/methods.	
 - Document server-side API.
-- Integrate into the [aliby](github.com/afermg/aliby) pipelining framework.
+- Integrate into the [aliby](github.com/afermg/aliby) pipelining framework, in a way that is agnostic to which model is being used.
 - Support containers that wrap the Nix derivations.
 
 ## Why nahual?
