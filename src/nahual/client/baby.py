@@ -112,7 +112,7 @@ def load_model(address: str, modelset: str):
 
 def run_sample(
     address: str,
-    modelset: str = "yeast-alcatras-brightfield-sCMOS-60x-1z",
+    modelset: str = "yeast-alcatras-brightfield-sCMOS-60x-5z",
     seed: int = 42,
 ):
     """Generate and send a sample image for processing.
@@ -169,6 +169,7 @@ def run_sample(
         img,
         address,
         session_id,
+        input_dimorder = "NYXZ"
     )
 
     return output
@@ -178,6 +179,7 @@ def process_data(
     img: np.ndarray,
     address: str,
     session_id: str,
+    input_dimorder : str = "NZYX"
     extra_args=(("refine_outlines", ("", "true")), ("with_edgemasks", ("", "true"))),
 ) -> list[dict[str, np.ndarray]]:
     """Sends image data to a baby-phone server session for segmentation.
@@ -228,6 +230,13 @@ def process_data(
     The initial parts of the multipart POST request (`dims`, `bitdepth`,
     `img`) must be in a fixed order.
     """
+    # Convert to uint8
+    # TODO check if BABY supports uint16
+    if img.dtype == np.uint16:
+        img = (img * 256 / 65536).astype(np.uint16)
+
+    # Convert from the input format to NYXZ
+    reordered = reorder_dims(img, input_dimorder = input_dimorder, output_dimorder="NZYX")
     # Initiate a multipart-encoded request
     requests.post(
         f"{address}/segment?sessionid={session_id}",
@@ -255,3 +264,10 @@ def process_data(
     ]
 
     return edgemasks_labels
+
+def reorder_dims(img:np.ndarray, input_dimorder:str, output_dimorder:str):
+    n_input = len(input_dimorder)
+    assert set(input_dimorder).intersection(output_dimorder)==n_input, f"Input {input_dimorder} and output {output_dimorder} characters differ"
+
+    output_dimorder_ids = [output_dimorder.index(x) for x in input_dimorder]
+    return np.transpose(img, output_dimorder_ids)
