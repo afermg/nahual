@@ -179,7 +179,7 @@ def process_data(
     img: np.ndarray,
     address: str,
     session_id: str,
-    input_dimorder : str = "NZYX"
+    input_dimorder : str = "NZYX",
     extra_args=(("refine_outlines", ("", "true")), ("with_edgemasks", ("", "true"))),
 ) -> list[dict[str, np.ndarray]]:
     """Sends image data to a baby-phone server session for segmentation.
@@ -233,18 +233,18 @@ def process_data(
     # Convert to uint8
     # TODO check if BABY supports uint16
     if img.dtype == np.uint16:
-        img = (img * 256 / 65536).astype(np.uint16)
+        img = ((img / 65536) * 256).astype(np.uint8)
 
     # Convert from the input format to NYXZ
-    reordered = reorder_dims(img, input_dimorder = input_dimorder, output_dimorder="NZYX")
+    reordered = reorder_dims(img, input_dimorder = input_dimorder, output_dimorder="NYXZ")
     # Initiate a multipart-encoded request
     requests.post(
         f"{address}/segment?sessionid={session_id}",
         files=[
             # The ordering of these parts must be fixed
-            ("dims", ("", str(list(img.shape)))),
+            ("dims", ("", str(list(reordered.shape)))),
             ("bitdepth", ("", "8")),
-            ("img", ("", img.tobytes(order="F"))),
+            ("img", ("", reordered.tobytes(order="F"))),
             # Optionally specify additional parts that set
             # any kwargs accepted by BabyCrawler.step (ordering
             # is no longer fixed)
@@ -263,11 +263,39 @@ def process_data(
         for out_pertile in outputs
     ]
 
+    # TODO convert edgemasks to flat 2d masks
+    # Return using updated labels?
     return edgemasks_labels
 
-def reorder_dims(img:np.ndarray, input_dimorder:str, output_dimorder:str):
-    n_input = len(input_dimorder)
-    assert set(input_dimorder).intersection(output_dimorder)==n_input, f"Input {input_dimorder} and output {output_dimorder} characters differ"
+import numpy as np
 
-    output_dimorder_ids = [output_dimorder.index(x) for x in input_dimorder]
-    return np.transpose(img, output_dimorder_ids)
+def reorder_dims(img: np.ndarray, input_dimorder: str, output_dimorder: str) -> np.ndarray:
+    """Reorders the dimensions of an array based on string specifications.
+
+    Parameters
+    ----------
+    img : np.ndarray
+        The input array.
+    input_dimorder : str
+        A string representing the order of dimensions in the input array,
+        e.g., 'NZYX' for Height, Width, Channels. Each character represents
+        one dimension.
+    output_dimorder : str
+        A string representing the desired order of dimensions in the output
+        array, e.g., 'NYXZ'. It must contain the same characters as
+        `input_dimorder`.
+
+    Returns
+    -------
+    np.ndarray
+        The array with reordered dimensions.
+
+    Raises
+    ------
+    ValueError
+        If dimension orders are invalid or incompatible with the array shape.
+    """
+    assert sorted(input_dimorder) == sorted(output_dimorder), "The strings must be permutations of each other"
+    axes_permutation = [input_dimorder.index(dim) for dim in output_dimorder]
+
+    return np.transpose(img, axes_permutation)
