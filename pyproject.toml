@@ -7,7 +7,7 @@ requires-python = ">=3.9,<=3.13"
 readme = "README.md"
 dependencies = [
   "loguru>=0.7.3",
-  "numpy>=2.0.0",
+  "numpy>=1.18.0",
   "pynng>=0.8.1",
   "requests",
 ]
