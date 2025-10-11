@@ -263,8 +263,6 @@ def process_data(
     return edgemasks_labels
 
 
-
-
 def reorder_dims(
     img: np.ndarray, input_dimorder: str, output_dimorder: str
 ) -> np.ndarray:
@@ -301,57 +299,69 @@ def reorder_dims(
     return np.transpose(img, axes_permutation)
 
 
-def matrix_to_edgemasks(arr:np.ndarray) -> list[tuple[int,int]]:
+def matrix_to_edgemasks(arr: np.ndarray) -> list[tuple[int, int]]:
     uniq = np.unique(arr)
-    uniq = uniq[uniq>0]
+    uniq = uniq[uniq > 0]
     d = {}
     for k in uniq:
-        d[k] = np.array(np.where(arr==k))
+        d[k] = np.array(np.where(arr == k))
 
     return list(d.values())
 
+
 def get_edgemasks_example(kind) -> np.ndarray:
     # tiny 6×6 label image
-    non_overlap = np.array([
-        [0, 0, 1, 1, 0, 0],
-        [0, 0, 1, 1, 0, 0],
-        [2, 2, 2, 0, 0, 0],
-        [2, 0, 2, 3, 3, 3],
-        [2, 2, 2, 3, 0, 3],
-        [0, 0, 0, 3, 3, 3]
-    ])
-    overlap = np.array([
-        [0, 0, 1, 1, 0, 0],
-        [0, 0, 1, 1, 0, 0],
-        [2, 2, 2, 2, 0, 0],
-        [2, 0, 0, 3, 3, 3],
-        [2, 2, 2, 3, 0, 3],
-        [0, 0, 0, 3, 3, 3]
-    ])
-    
+    non_overlap = np.array(
+        [
+            [0, 0, 1, 1, 0, 0],
+            [0, 0, 1, 1, 0, 0],
+            [2, 2, 2, 0, 0, 0],
+            [2, 0, 2, 3, 3, 3],
+            [2, 2, 2, 3, 0, 3],
+            [0, 0, 0, 3, 3, 3],
+        ]
+    )
+    overlap = np.array(
+        [
+            [0, 0, 1, 1, 0, 0],
+            [0, 0, 1, 1, 0, 0],
+            [2, 2, 2, 2, 0, 0],
+            [2, 0, 0, 3, 3, 3],
+            [2, 2, 2, 3, 0, 3],
+            [0, 0, 0, 3, 3, 3],
+        ]
+    )
+
     edgemasks = matrix_to_edgemasks(overlap)
     # Add overlaps here
-    edgemasks[1] = np.concatenate((edgemasks[1],((3,4),(3,3))), axis=1)
-    
+    edgemasks[1] = np.concatenate((edgemasks[1], ((3, 4), (3, 3))), axis=1)
+
     examples = {
-        "overlap":edgemasks,
-        "non_overlap":matrix_to_edgemasks(non_overlap),
+        "overlap": edgemasks,
+        "non_overlap": matrix_to_edgemasks(non_overlap),
     }
     return examples[kind]
 
-def overlap_from_edgemasks(edgemasks:list[np.ndarray]) -> list[tuple[int,int]]:
-    edges = np.asarray([(np.min(edge_set, axis=1), np.max(edge_set, axis=1)) for edge_set in edgemasks])
+
+def overlap_from_edgemasks(edgemasks: list[np.ndarray]) -> list[tuple[int, int]]:
+    edges = np.asarray(
+        [(np.min(edge_set, axis=1), np.max(edge_set, axis=1)) for edge_set in edgemasks]
+    )
     # Masking can probably occur with a matrix of a specific shape
     # For now I will do iteration
     overlaps = []
     for i, ((left, top), (right, bottom)) in enumerate(edges):
-        for j, ((other_left, other_top), (other_right, other_bottom)) in enumerate(edges):
-            if i>=j:
+        for j, ((other_left, other_top), (other_right, other_bottom)) in enumerate(
+            edges
+        ):
+            if i >= j:
                 continue
             # print(f"{left} >= {other_left} and {other_right} <= {right}")
             # print(f"{top} >= {other_top} and {bottom} <= {other_bottom}")
-            if (right >= other_left and left <= other_right) and (bottom >= other_top and top <= other_bottom):
-                overlaps += [(i,j)]
+            if (right >= other_left and left <= other_right) and (
+                bottom >= other_top and top <= other_bottom
+            ):
+                overlaps += [(i, j)]
 
     return overlaps
 
@@ -380,22 +390,11 @@ def edgemasks_to_ijv(masks: list[np.ndarray]) -> np.ndarray:
     return ijv
 
 
-# def edge_to_ijv():
-# def edge_to_nzyx():
-# """Convert a representation of edgemasks into a dense representation of overlapping
-# masks where the first dimension ensures no overlap.
-# """
-# 1.Check any overlap
-# 1.1 Min-on-max
-# 2. If exists, identify which sets of masks overlap
-# 3. Solve as a linear programming problem
-# 3.1 Find the smallest number of subgroups
-# 3.2 Sort by size
-# 3.3 Assign subgroup to all non-overlapping masks
-# 3.4
-
-
-def index_isin(x: np.ndarray, y: np.ndarray, i_dtype = {"names": ["i", "j", "v"], "formats": [np.uint16, np.uint16, np.uint16]}) -> np.ndarray:
+def index_isin(
+    x: np.ndarray,
+    y: np.ndarray,
+    i_dtype={"names": ["i", "j", "v"], "formats": [np.uint16, np.uint16, np.uint16]},
+) -> np.ndarray:
     """
     Find those elements of x that are in y.
 
