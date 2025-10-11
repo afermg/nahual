@@ -263,7 +263,6 @@ def process_data(
     return edgemasks_labels
 
 
-import numpy as np
 
 
 def reorder_dims(
@@ -302,53 +301,72 @@ def reorder_dims(
     return np.transpose(img, axes_permutation)
 
 
-def get_data():
-    mask = np.array([[0, 1, 1, 1, 2, 2], [1, 0, 2, 3, 3, 1]])
+def matrix_to_edgemasks(arr:np.ndarray) -> list[tuple[int,int]]:
+    uniq = np.unique(arr)
+    uniq = uniq[uniq>0]
+    d = {}
+    for k in uniq:
+        d[k] = np.array(np.where(arr==k))
 
-    return (mask, mask + 1)
+    return list(d.values())
+
+def get_edgemasks_example(kind) -> np.ndarray:
+    # tiny 6×6 label image
+    non_overlap = np.array([
+        [0, 0, 1, 1, 0, 0],
+        [0, 0, 1, 1, 0, 0],
+        [2, 2, 2, 0, 0, 0],
+        [2, 0, 2, 3, 3, 3],
+        [2, 2, 2, 3, 0, 3],
+        [0, 0, 0, 3, 3, 3]
+    ])
+    overlap = np.array([
+        [0, 0, 1, 1, 0, 0],
+        [0, 0, 1, 1, 0, 0],
+        [2, 2, 2, 2, 0, 0],
+        [2, 0, 0, 3, 3, 3],
+        [2, 2, 2, 3, 0, 3],
+        [0, 0, 0, 3, 3, 3]
+    ])
+    
+    edgemasks = matrix_to_edgemasks(overlap)
+    # Add overlaps here
+    edgemasks[1] = np.concatenate((edgemasks[1],((3,4),(3,3))), axis=1)
+    
+    examples = {
+        "overlap":edgemasks,
+        "non_overlap":matrix_to_edgemasks(non_overlap),
+    }
+    return examples[kind]
+
+def overlap_from_edgemasks(edgemasks:list[np.ndarray]) -> list[tuple[int,int]]:
+    edges = np.asarray([(np.min(edge_set, axis=1), np.max(edge_set, axis=1)) for edge_set in edgemasks])
+    # Masking can probably occur with a matrix of a specific shape
+    # For now I will do iteration
+    overlaps = []
+    for i, ((left, top), (right, bottom)) in enumerate(edges):
+        for j, ((other_left, other_top), (other_right, other_bottom)) in enumerate(edges):
+            if i>=j:
+                continue
+            # print(f"{left} >= {other_left} and {other_right} <= {right}")
+            # print(f"{top} >= {other_top} and {bottom} <= {other_bottom}")
+            if (right >= other_left and left <= other_right) and (bottom >= other_top and top <= other_bottom):
+                overlaps += [(i,j)]
+
+    return overlaps
 
 
-def find_overlap_from_ijv(ijv: np.ndarray, uniq, col: int) -> list[np.ndarray]:
-    """
-    Find ijv subsets with at least one value
-    "sandwiched" between two over `col`.
-    """
-    v_col = 2
-    argsort = ijv[:, col].argsort()
-    sorted_labels = ijv[argsort, v_col]
-
-    # Find the boundaries using a boolean array per label
-    vals = uniq[:, None] == sorted_labels
-    left = vals.argmax(axis=1)
-    right = vals[:, ::-1].argmax(axis=1)
-
-    # These "inbetween" pixels may not be homogeneous,
-    # that is why I am using lists
-    between = [ijv[argsort][start:end] for start, end in zip(left, (len(ijv) - right))]
-
-    arg_overlap = [np.where(x[:, v_col] != x_val)[0] for x, x_val in zip(between, uniq)]
-    overlap_ijv = [between[i][x] for i, x in enumerate(arg_overlap)]
-
-    return overlap_ijv
-
-
-def find_overlapping_pixels(ijv: np.ndarray) -> dict[int, np.ndarray]:
-    uniq = np.unique(ijv[:, v_col])
-    x_overlap = find_overlap_from_ijv(ijv, col=0, uniq=uniq)
-    y_overlap = find_overlap_from_ijv(ijv, col=1, uniq=uniq)
-
-    result =  {label: x[index_isin(x, y)[:,0]] for label, x, y in zip(uniq, x_overlap, y_overlap)}
-    return result
-
-
-def group_edgemasks(masks: list[np.ndarray]):
+def group_edgemasks(edgemasks: list[np.ndarray]):
     # Cells are considered overlapping if for any pixel (x_1,y_1) there is a pair of pixels (x_2,y_2), (x_3,y_3) belonging to a different mask
     # where (x_2 < x_1 < x_3) and (y_2 < y_1 < y_3).
-    ijv = edgemasks_to_ijv(masks)
+    ijv = edgemasks_to_ijv(edgemasks)
+    overlaps = overlap
 
 
 def edgemasks_to_ijv(masks: list[np.ndarray]) -> np.ndarray:
-    """Convert edgemasks to an ijv matrix"""
+    """Convert edgemasks to an ijv matrix.
+
+    An edgemask is a list of 2-d arrays, where each list"""
     lens = [len(x[0]) for x in masks]
     ijv = np.zeros((np.sum(lens), 3), dtype=np.uint16)
     position = np.zeros(len(lens) + 1, dtype=np.uint16)
@@ -394,56 +412,3 @@ def index_isin(x: np.ndarray, y: np.ndarray, i_dtype = {"names": ["i", "j", "v"]
     inboth = np.intersect1d(xv, y.view(i_dtype))
     x_bool = np.isin(xv, inboth)
     return x_bool
-
-
-# Old code
-# There may be a way to do this with broadcasting
-# but it eluded me
-# simple = np.array([0,2,1,3])
-# ijv = np.stack((simple,simple, (0,0,1,1))).T
-
-# vals = np.unique(ijv[:,2])
-# occurrences = vals[:,None] == ijv[:,2]
-
-# less_x = np.less_equal.outer(ijv[:,0],ijv[:,0])
-# greater_x = np.greater_equal.outer(ijv[:,0],ijv[:,0])
-# less_y = np.less_equal.outer(ijv[:,1],ijv[:,1])
-# greater_y = np.greater_equal.outer(ijv[:,1],ijv[:,1])
-
-# Places where the pixels sits between two others
-# TODO Fix: ensure the output corresponds to in-between
-# x = i, y = lower than i?, z = higher than i?
-# inbetween_x = (less_x[..., None] & greater_x[None])
-# correct = np.array([less_x[i][:,None] & greater_x[i] for i in range(len(less_x))])
-# inbetween_x = (less_x & greater_x[:,None]).transpose((2,0,1))
-# inbetween_y = (less_y & greater_y[:,None]).transpose((2,0,1))
-# Remove the ones from the same object (equal_v)
-# Remove the ones where the pixels belong to the same object
-# array([[,
-#         [ True, False, False, False],
-#         [ True, False, False, False],
-#         [ True, False, False, False]],
-
-#        [[False, False, False, False],
-#         [ True,  True, False, False],
-#         [ True,  True, False, False],
-#         [ True,  True, False, False]],
-
-#        [[False, False, False, False],
-#         [False, False, False, False],
-#         [ True,  True,  True, False],
-#         [ True,  True,  True, False]],
-
-#        [[False, False, False, False],
-#         [False, False, False, False],
-#         [False, False, False, False],
-#         [ True,  True,  True,  True]]])
-
-# inbetween_x = less_x & greater_x[:,None]
-# inbetween_y = less_y & greater_y[:,None]
-# Inbetween = inbetween_x & inbetween_y
-
-# # Filter where it is each object
-# overlaps = np.where(inbetween & equal_v)
-
-# return np.unique(ijv[overlalps,2])
