@@ -411,3 +411,36 @@ def index_isin(
     inboth = np.intersect1d(xv, y.view(i_dtype))
     x_bool = np.isin(xv, inboth)
     return x_bool
+
+# %%
+example = get_edgemasks_example("overlap")
+overlapping_indices = overlap_from_edgemasks(example)
+
+# Visualisation help
+max_size = max([np.array(x).max() for x in example])
+masks = np.zeros((max_size+1,max_size+1), dtype=int)
+for object_id, (xcoords, ycoords) in enumerate(example, 1):
+    for x,y in zip(xcoords, ycoords):
+        masks[x,y] = object_id
+
+def colour_object_labels(graph_edge_representation:list[tuple[int,int]]):
+    unique_indices, adjacency_list = generate_adjacency_from_overlapping(graph_edge_representation)
+
+    from nahual.utils import dsatur
+
+def generate_adjacency_from_overlapping(overlapping_indices) -> list[tuple[int,int]]:
+    """
+    The input is the actual cell ids with overlapping indices.
+    The output is a tuple where the first value are the unique indices (from the input) and the output is an adjacency list representation (lists with all the connected nodes.).
+    """
+    unique_indices = sorted(set([y for x in overlapping_indices for y in x]))
+    n_nodes = len(unique_indices)
+    adjacency_graph = [[] for _ in  range(n_nodes)]
+    for (node1, node2) in overlapping_indices:
+        adjacency_graph[unique_indices.index(node1)].append(node2)
+        adjacency_graph[unique_indices.index(node2)].append(node1)
+        
+    return unique_indices, adjacency_graph
+    
+
+tmp = generate_adjacency_from_overlapping(overlapping_indices)
