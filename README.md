@@ -2,7 +2,7 @@
 <img src="./logo.svg" width="150px">
 </div>
 
-# Nahual: Deploy and use models to process across environments/processes.
+# Nahual: Communication layer to send and transform data across environments and/or processes.
 
 The problem: When trying to train, compare and deploy many different models (deep learning or otherwise), the number of dependencies in one Python environment can get out of control very quickly (e.g., one model requires PyTorch 2.1 and another one 2.7). 
 
