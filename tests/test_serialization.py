@@ -11,9 +11,9 @@ def test_serialization(shape: tuple[int], dtype: str):
     data = numpy.random.randint(64, size=(3, 10, 10)).astype(numpy.dtype(dtype))
     serialized = serialize_numpy(data)
     deserialized = deserialize_numpy(serialized)
-    assert data.dtype == deserialized.dtype, (
-        "Data types are not retained upon serialization"
-    )
-    assert data.shape == deserialized.shape, (
-        "Shapes are not retained upon serialization"
-    )
+    assert (
+        data.dtype == deserialized.dtype
+    ), "Data types are not retained upon serialization"
+    assert (
+        data.shape == deserialized.shape
+    ), "Shapes are not retained upon serialization"

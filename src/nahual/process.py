@@ -41,9 +41,9 @@ def send_receive_process(
 ):
     # Optional input type-checking
     if expected_input_dtype is not None:
-        assert isinstance(data, expected_input_dtype), (
-            f"Input type {type(data)} does not match expected input type {expected_input_dtype}"
-        )
+        assert isinstance(
+            data, expected_input_dtype
+        ), f"Input type {type(data)} does not match expected input type {expected_input_dtype}"
 
     # encode
     packet = serialize(data)
@@ -51,7 +51,7 @@ def send_receive_process(
     response = request_receive(packet, address=address)
     # deserialize
     output = deserialize(response, dtype=expected_output_dtype)
-
+    
     return output
 
 
