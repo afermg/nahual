@@ -7,6 +7,8 @@
   pynng,
   requests,
   pytest,
+  loguru,
+  matplotlib,
 }:
 buildPythonPackage {
   pname = "nahual";
@@ -30,6 +32,8 @@ buildPythonPackage {
     pynng
     requests
     pytest
+    loguru
+    matplotlib
   ];
 
   pythonImportsCheck = [

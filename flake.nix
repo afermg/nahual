@@ -45,7 +45,8 @@
                 python_with_pkgs
                 # python3Packages.venvShellHook
                 pkgs.uv
-              ] ++ libList;
+              ]
+              ++ libList;
               venvDir = "./.venv";
               postVenvCreation = ''
                 unset SOURCE_DATE_EPOCH
@@ -55,7 +56,7 @@
               '';
               shellHook = ''
                 export LD_LIBRARY_PATH=$NIX_LD_LIBRARY_PATH:$LD_LIBRARY_PATH
-                uv sync
+                uv sync --all-groups
                 source .venv/bin/activate
               '';
             };
