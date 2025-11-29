@@ -112,72 +112,12 @@ def load_model(address: str, modelset: str):
     return session_id
 
 
-def run_sample(
-    address: str,
-    modelset: str = "yeast-alcatras-brightfield-sCMOS-60x-5z",
-    seed: int = 42,
-):
-    """Generate and send a sample image for processing.
-
-    Creates a random sample image, ensures a processing session is active on the
-    baby-phone server, sends the image for segmentation, and returns the result.
-    If no sessions are running, it will create one using the specified model set.
-
-    Parameters
-    ----------
-    address : str
-        The URL of the baby-phone server.
-    modelset : str, optional
-        The name of the model set to load if a new session needs to be created.
-        Defaults to "yeast-alcatras-brightfield-sCMOS-60x-1z".
-    seed : int, optional
-        Seed for the random number generator to create the sample image.
-        By default, 42.
-
-    Returns
-    -------
-    dict or str
-        A dictionary containing the segmentation results from the server if the
-        request is successful. Otherwise, returns the error text from the
-        server response.
-
-    See Also
-    --------
-    list_sessions : List running sessions on the server.
-    load_model : Load a model and create a new session.
-    process_data : Send data for processing within an existing session.
-
-    Notes
-    -----
-    This function internally generates a random image of shape (2, 80, 120, 1)
-    and dtype 'uint8' for processing. The image generation is seeded by the
-    `seed` parameter for reproducibility.
-
-    """
-    rng = np.random.default_rng(seed)
-
-    running_sessions = list_sessions(address)
-    session_id = (
-        running_sessions[0]
-        if len(running_sessions) > 0
-        else load_model(address, modelset)
-    )
-
-    # Create suitable N x H x W x Z array
-    # dtype must be either uint8 or uint16
-    img = rng.integers(2**8, size=(2, 80, 120, 1), dtype="uint8")
-
-    output = process_data(img, address, session_id, input_dimorder="NYXZ")
-
-    return output
-
-
 def process_data(
     img: np.ndarray,
     address: str,
     session_id: str,
     input_dimorder: str = "NZYX",
-    extra_args=(("refine_outlines", ("", "true")), ("with_edgemasks", ("", "true"))),
+    extra_args:tuple[tuple[str,tuple[str,str]]]=(("refine_outlines", ("", "true")), ("with_edgemasks", ("", "true")), ("with_masks", ("", "true"))),
 ) -> list[dict[str, np.ndarray]]:
     """Sends image data to a baby-phone server session for segmentation.
 
@@ -262,25 +202,34 @@ def process_data(
 
     pertile_nyx = []
     pertile_layers = []
-    for d in edgemask_labels:
-        labels = d["cell_label"]
-        edgemasks = d["edgemasks"]
-        masks = d["masks"]
+    
+    for tile in edgemask_labels:
+        labels = tile["cell_label"]
         
-        layers_d = get_layers_from_edgemasks(edgemasks)
-        pertile_layers.append(layers_d)
-        
-        n_layers = max(layers_d.values()) + 1
-        nyx = np.zeros((n_layers, *img.shape[1:3]), dtype=int)
-        
-        # Place the cells back in their corresponding layer
-        for object_index, layer in layers_d.items():
-            xy =  masks[object_index]
-            x,y =xy
-            nyx[layer,x,y] = labels[object_index]
+        nyx = np.zeros((0, *img.shape[1:3]), dtype=int)
+        if len(labels): # Cover case of tiles 
+            edgemasks = tile["edgemasks"]
+            masks = tile["masks"]
+            xs = [max(m[0]) for m in edgemasks]
+            ys = [max(m[1]) for m in edgemasks]
+            assert all([x < img.shape[1] for x in xs])
+            assert all([y < img.shape[2] for y in ys])
+
+            mapper_label_layer = get_layers_from_edgemasks(edgemasks)
+            pertile_layers.append(mapper_label_layer)
+
+            n_layers = max(mapper_label_layer.values()) + 1
+            nyx = np.zeros((n_layers, *img.shape[1:3]), dtype=int)
+
+            # Place the cells back in their corresponding layer
+            # [[max(m) for m in mask_set] for mask_set in masks]
+            for object_index, layer in mapper_label_layer.items():
+                x,y =  masks[object_index]
+                nyx[layer,x,y] = labels[object_index]
             
         pertile_nyx.append(nyx)
-        
+
+    
     return pertile_nyx
 
 
@@ -436,6 +385,66 @@ def get_edgemasks_case(kind) -> np.ndarray:
     examples["overlap"] =  overlap_edgemasks
     return examples[kind]
 
+
+def run_sample(
+    address: str,
+    modelset: str = "yeast-alcatras-brightfield-sCMOS-60x-5z",
+    seed: int = 42,
+):
+    """Generate and send a sample image for processing.
+
+    Creates a random sample image, ensures a processing session is active on the
+    baby-phone server, sends the image for segmentation, and returns the result.
+    If no sessions are running, it will create one using the specified model set.
+
+    Parameters
+    ----------
+    address : str
+        The URL of the baby-phone server.
+    modelset : str, optional
+        The name of the model set to load if a new session needs to be created.
+        Defaults to "yeast-alcatras-brightfield-sCMOS-60x-1z".
+    seed : int, optional
+        Seed for the random number generator to create the sample image.
+        By default, 42.
+
+    Returns
+    -------
+    dict or str
+        A dictionary containing the segmentation results from the server if the
+        request is successful. Otherwise, returns the error text from the
+        server response.
+
+    See Also
+    --------
+    list_sessions : List running sessions on the server.
+    load_model : Load a model and create a new session.
+    process_data : Send data for processing within an existing session.
+
+    Notes
+    -----
+    This function internally generates a random image of shape (2, 80, 120, 1)
+    and dtype 'uint8' for processing. The image generation is seeded by the
+    `seed` parameter for reproducibility.
+
+    """
+    rng = np.random.default_rng(seed)
+
+    running_sessions = list_sessions(address)
+    session_id = (
+        running_sessions[0]
+        if len(running_sessions) > 0
+        else load_model(address, modelset)
+    )
+
+    # Create suitable N x H x W x Z array
+    # dtype must be either uint8 or uint16
+    img = rng.integers(2**8, size=(2, 80, 120, 1), dtype="uint8")
+
+    output = process_data(img, address, session_id, input_dimorder="NYXZ")
+
+    return output
+
 # Now we need to cover for empty cases to count the number of layers in the new dimension:
 # Let N be the number of overlapping layers
 # Overlapping and non-overlapping: N
@@ -443,6 +452,10 @@ def get_edgemasks_case(kind) -> np.ndarray:
 # Non-overlapping only: 1
 # No objects: Return empty array with dimensions (NZYX)
 
+if __file__ == "main":
+    address = "http://0.0.0.0:5101"  # URL to reach baby-phone
+    modelset = "yeast-alcatras-brightfield-sCMOS-60x-1z"
+    result = run_sample(address, modelset)
 
 # %%
 # for case_ in ("overlap", "no_overlap", "zeros", "empty"):
