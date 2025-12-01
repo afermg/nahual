@@ -32,11 +32,17 @@ im = numpy.array(Image.open(path))
 img = im[x:x+window, y:y+window][numpy.newaxis,...,numpy.newaxis]
 img = ((img / 65536) * 256).astype(numpy.uint8)
 
-# Create suitable N x H x W x Z array
+# %%
+# Alternatively, create a suitable N x H x W x Z array
 # dtype must be either uint8 or uint16
+# import numpy as np
+# rng = np.random.default_rng(12345)
 # img = rng.integers(2**8, size=(2, 80, 120, 1), dtype="uint8")
+
+#Additional parameters
 extra_args = (("refine_outlines", ("", "true")), ("with_edgemasks", ("", "true")), ("with_masks", ("", "true")))
 
+# Returns output in NYX format
 output = bb.process_data(
     img,
     address,

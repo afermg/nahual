@@ -212,14 +212,14 @@ def process_data(
             masks = tile["masks"]
             xs = [max(m[0]) for m in edgemasks]
             ys = [max(m[1]) for m in edgemasks]
-            assert all([x < img.shape[1] for x in xs])
-            assert all([y < img.shape[2] for y in ys])
+            assert all([x < img.shape[-2] for x in xs])
+            assert all([y < img.shape[-1] for y in ys])
 
             mapper_label_layer = get_layers_from_edgemasks(edgemasks)
             pertile_layers.append(mapper_label_layer)
 
             n_layers = max(mapper_label_layer.values()) + 1
-            nyx = np.zeros((n_layers, *img.shape[1:3]), dtype=int)
+            nyx = np.zeros((n_layers, *img.shape[-2:]), dtype=int)
 
             # Place the cells back in their corresponding layer
             # [[max(m) for m in mask_set] for mask_set in masks]
