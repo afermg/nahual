@@ -113,9 +113,10 @@ def load_model(address: str, modelset: str):
 
 
 def process_data(
-    img: np.ndarray,
+    pixels: np.ndarray,
     address: str,
     session_id: str,
+    channel_to_segment:int,
     input_dimorder: str = "NZYX",
     extra_args:tuple[tuple[str,tuple[str,str]]]=(("refine_outlines", ("", "true")), ("with_edgemasks", ("", "true")), ("with_masks", ("", "true"))),
 ) -> list[dict[str, np.ndarray]]:
@@ -129,7 +130,7 @@ def process_data(
 
     Parameters
     ----------
-    img : numpy.ndarray
+    pixels : numpy.ndarray
         The image data to be processed. Expected to be a 4D NumPy array with
         shape (N, H, W, Z), where N is the number of images, H is height, W
         is width, and Z is the number of z-slices.
@@ -163,17 +164,19 @@ def process_data(
     2. A GET request to fetch the completed results.
 
     The image data is serialized into bytes using Fortran order via
-    `img.tobytes(order="F")`. The bit depth is hardcoded to "8".
+    `pixels.tobytes(order="F")`. The bit depth is hardcoded to "8".
     The initial parts of the multipart POST request (`dims`, `bitdepth`,
-    `img`) must be in a fixed order.
+    `pixels`) must be in a fixed order.
     """
+    pixels = pixels[:, channel_to_segment]
+    
     # Convert to uint8
     # TODO check if BABY supports uint16
-    if img.dtype == np.uint16:
-        img = ((img / 65536) * 256).astype(np.uint8)
+    if pixels.dtype == np.uint16:
+        pixels = ((pixels / 65536) * 256).astype(np.uint8)
 
     # Convert from the input format to NYXZ
-    reordered = reorder_dims(img, input_dimorder=input_dimorder, output_dimorder="NYXZ")
+    reordered = reorder_dims(pixels, input_dimorder=input_dimorder, output_dimorder="NYXZ")
     # Initiate a multipart-encoded request
     requests.post(
         f"{address}/segment?sessionid={session_id}",
@@ -206,20 +209,20 @@ def process_data(
     for tile in edgemask_labels:
         labels = tile["cell_label"]
         
-        nyx = np.zeros((0, *img.shape[1:3]), dtype=int)
+        nyx = np.zeros((0, *pixels.shape[1:3]), dtype=int)
         if len(labels): # Cover case of tiles 
             edgemasks = tile["edgemasks"]
             masks = tile["masks"]
             xs = [max(m[0]) for m in edgemasks]
             ys = [max(m[1]) for m in edgemasks]
-            assert all([x < img.shape[-2] for x in xs])
-            assert all([y < img.shape[-1] for y in ys])
+            assert all([x < pixels.shape[-2] for x in xs])
+            assert all([y < pixels.shape[-1] for y in ys])
 
             mapper_label_layer = get_layers_from_edgemasks(edgemasks)
             pertile_layers.append(mapper_label_layer)
 
             n_layers = max(mapper_label_layer.values()) + 1
-            nyx = np.zeros((n_layers, *img.shape[-2:]), dtype=int)
+            nyx = np.zeros((n_layers, *pixels.shape[-2:]), dtype=int)
 
             # Place the cells back in their corresponding layer
             # [[max(m) for m in mask_set] for mask_set in masks]
@@ -452,10 +455,10 @@ def run_sample(
 # Non-overlapping only: 1
 # No objects: Return empty array with dimensions (NZYX)
 
-if __file__ == "main":
-    address = "http://0.0.0.0:5101"  # URL to reach baby-phone
-    modelset = "yeast-alcatras-brightfield-sCMOS-60x-1z"
-    result = run_sample(address, modelset)
+# if __file__ == "main":
+# address = "http://0.0.0.0:5101"  # URL to reach baby-phone
+# modelset = "yeast-alcatras-brightfield-sCMOS-60x-1z"
+# result = run_sample(address, modelset)
 
 # %%
 # for case_ in ("overlap", "no_overlap", "zeros", "empty"):
