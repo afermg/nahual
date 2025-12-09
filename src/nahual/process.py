@@ -60,6 +60,7 @@ def dispatch_setup_process(name: str):
     OUTPUT_SIGNATURES = dict(
         cellpose=("dict", "numpy"),
         dinov2=("dict", "numpy"),
+        vit=("dict", "numpy"),
         trackastra=("dict", "dict"),
     )
 
