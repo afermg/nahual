@@ -68,7 +68,7 @@ To reduce maintenance burden, we support only the necessary data types:
 
 ### Tech stack 
 - Model/tool deployment I use [Nix](https://nixos.org/), and at the moment do not plan to support containers. The logic behind  gives me unique guarantees of reproducibility, whilst allowing me to use bleeding edge models and libraries.
-- Transport layer I use [pynng](github.com/codypiersall/pynng), I like that it is very minimalistic and provides easy-to-reproduce [[https://github.com/codypiersall/pynng/tree/7fd3d76573c3cb40c1e5f7e10d4a6091e411b9c2/examples][examples]]. An alternative would have been `gRPC` + `protobuf`, but since I am trying to understand the constraints and tradeoffs I do not want to commit to a big framework unless I have a compelling reason to do so.
+- Transport layer I use [pynng](github.com/codypiersall/pynng), I like that it is very minimalistic and provides easy-to-reproduce [https://github.com/codypiersall/pynng/tree/7fd3d76573c3cb40c1e5f7e10d4a6091e411b9c2/examples](examples). An alternative would have been `gRPC` + `protobuf`, but since I am trying to understand the constraints and tradeoffs I do not want to commit to a big framework unless I have a compelling reason to do so.
 
 ## Adding support for new models
 Any model requires a thin layer that communicates using [nng](https://github.com/nanomsg/nng). You can see an example of trackastra's [server](https://github.com/afermg/trackastra/blob/main/server.py) and [client](./examples/trackastra.py).
