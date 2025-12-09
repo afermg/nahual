@@ -41,8 +41,8 @@ buildPythonPackage {
   ];
 
   meta = {
-    description = "Python bindings for Nanomsg Next Generation";
-    homepage = "https://github.com/codypiersall/pynng";
+    description = " Deploy and access image and data processing models from different environments.";
+    homepage = "https://github.com/afermg/nahual";
     license = lib.licenses.mit;
     maintainers = with lib.maintainers; [ afermg ];
     platforms = lib.platforms.all;

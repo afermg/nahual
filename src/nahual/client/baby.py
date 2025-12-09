@@ -213,10 +213,14 @@ def process_data(
         if len(labels): # Cover case of tiles 
             edgemasks = tile["edgemasks"]
             masks = tile["masks"]
-            xs = [max(m[0]) for m in edgemasks]
-            ys = [max(m[1]) for m in edgemasks]
-            assert all([x < pixels.shape[-2] for x in xs])
-            assert all([y < pixels.shape[-1] for y in ys])
+            xs_max = [max(m[0]) for m in edgemasks]
+            ys_max = [max(m[1]) for m in edgemasks]
+            xs_min = [min(m[0]) for m in edgemasks]
+            ys_min = [min(m[1]) for m in edgemasks]
+            assert all([x <= pixels.shape[-2] for x in xs_max])
+            assert all([y <= pixels.shape[-1] for y in ys_max])
+            assert all([x > 0 for x in xs_min])
+            assert all([y > 0 for y in ys_min])
 
             mapper_label_layer = get_layers_from_edgemasks(edgemasks)
             pertile_layers.append(mapper_label_layer)
@@ -227,8 +231,8 @@ def process_data(
             # Place the cells back in their corresponding layer
             # [[max(m) for m in mask_set] for mask_set in masks]
             for object_index, layer in mapper_label_layer.items():
-                x,y =  masks[object_index]
-                nyx[layer,x,y] = labels[object_index]
+                x,y = np.array(masks[object_index])-1
+                nyx[layer,x-1,y-1] = labels[object_index]
             
         pertile_nyx.append(nyx)
 

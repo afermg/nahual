@@ -56,8 +56,8 @@
               '';
               shellHook = ''
                 export LD_LIBRARY_PATH=$NIX_LD_LIBRARY_PATH:$LD_LIBRARY_PATH
-                uv sync --all-groups
-                source .venv/bin/activate
+                # uv sync --all-groups
+                # source .venv/bin/activate
               '';
             };
         };
