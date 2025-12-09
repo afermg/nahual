@@ -2,13 +2,13 @@
 <img src="./logo.svg" width="150px">
 </div>
 
-# Nahual: Deploy and use models to process across environments/processes.
+# Nahual: Communication layer to send and transform data across environments and/or processes.
 
 The problem: When trying to train, compare and deploy many different models (deep learning or otherwise), the number of dependencies in one Python environment can get out of control very quickly (e.g., one model requires PyTorch 2.1 and another one 2.7). 
 
 Potential solution: I figured that if we can move parameters and numpy arrays between environments, we can isolate each model and having them process our data on-demand. 
 
-Thus the goal of this tool is provide a way to deploy model(s) in one (on multiple) environments, and access them from a different one.
+Thus the goal of this tool is provide a way to deploy model(s) in one (or many) environments, and access them from another one, usually an orchestrator.
 
 ## Available models and tools 
 By default, the models and tools are deployable using [Nix](https://nixos.org/).
