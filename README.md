@@ -11,16 +11,19 @@ Potential solution: I figured that if we can move parameters and numpy arrays be
 Thus the goal of this tool is provide a way to deploy model(s) in one (or many) environments, and access them from another one, usually an orchestrator.
 
 ## Available models and tools 
-By default, the models and tools are deployable using [Nix](https://nixos.org/).
+I deployed tools using [Nix](https://nixos.org/).
 
 - [BABY](https://github.com/afermg/baby): Segmentation, tracking and lineage assignment for budding yeast.
 - [Cellpose](https://github.com/afermg/cellpose): Generalist segmentation model.
 - [DINOv2](https://github.com/afermg/dinov2): Generalist self-supervised model to obtain visual features.
 - [Trackastra](https://github.com/afermg/trackastra): Transformer-based tracking trained on a multitude of datasets.
 - [ViT](https://github.com/afermg/nahual_vit): HuggingFace's Visual Transformers models (e.g., [OpenPhenom](https://huggingface.co/recursionpharma/OpenPhenom)). 
-
-## WIP
+- [SubCell](https://github.com/afermg/SubCellPortable): Encoder of single cell morphology and protein localisation.
 - [DINOv3](https://github.com/afermg/dinov3): Generalist self-supervised model, latest iteration.
+
+## Future supported tools
+- [DeepProfiler](https://github.com/cytomining/DeepProfiler)
+- [scDINO](https://github.com/JacobHanimann/scDINO)
 
 ## Usage
 ### Step 1: Deploy server
