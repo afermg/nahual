@@ -12,9 +12,12 @@ setup, process = dispatch_setup_process("dinov2")
 address = "ipc:///tmp/dinov2.ipc"
 
 # %%Load models server-side
-parameters = {"repo_or_dir": "facebookresearch/dinov2", "model": "dinov2_vits14_lc"}
+parameters = {
+    "repo_or_dir": "facebookresearch/dinov2",
+    "model_name": "dinov2_vits14_lc",
+}
 response = setup(parameters, address=address)
 
 # %% Define custom data
-data = numpy.random.random_sample((1, 3, 420, 420))
+data = numpy.random.random_sample((2, 3, 420, 420))
 result = process(data + 1000, address=address)
