@@ -19,5 +19,6 @@ parameters = {
 response = setup(parameters, address=address)
 
 # %% Define custom data
-data = numpy.random.random_sample((2, 3, 420, 420))
-result = process(data + 1000, address=address)
+# Added z-dimension
+data = numpy.random.random_sample((2, 3, 1, 420, 420))
+result = process(data, address=address)
