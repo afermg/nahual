@@ -167,7 +167,13 @@ def get_output_signature(name: str) -> tuple[str, str]:
         "recursionpharma/OpenPhenom": ("dict", "numpy"),
     }
 
-    return OUTPUT_SIGNATURES[name]
+    if name in OUTPUT_SIGNATURES:
+        signature = OUTPUT_SIGNATURES[name]
+    else:
+        # Use the prefix of the model
+        signature = OUTPUT_SIGNATURES[name.split("_")[0]]
+
+    return signature
 
 
 def dispatch_setup_process(
@@ -205,7 +211,7 @@ def dispatch_setup_process(
 
     if isinstance(signature, str):
         # Assumes get_output_signature is defined elsewhere
-        signature = get_output_signature(signature)
+        signature: tuple[str] = get_output_signature(signature)
 
     # Assumes send_receive_process is defined elsewhere
     setup, process = [
