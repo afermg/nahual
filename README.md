@@ -63,7 +63,7 @@ I strive to be as lean as possible (both in dependency count and architectural c
 - Transport layer: We need to move the data between environments. I also wrote my own (trivially simple) numpy serializer. Since we have Python at both ends of the connection, we can reuse these functions server-side.
 - Orchestration: This can be a script, or my own pipelining framework [aliby](https://github.com/afermg/aliby), massages the data into the desired shape/type, and then hands it over to `nahual`.
 
-This tool is my personal one-stop-shop source for multiple models to process imaging data or their derivatives. Please note that this is work in progress, and very likely to undergo major changes as I understand the core challenges.
+This tool is my personal one-stop-shop source for multiple models to process imaging data or their derivatives. Please note that this is work in progress, and very likely to undergo major changes as I develop a better understanding of the main challenges.
 
 To reduce maintenance burden, we support only the necessary data types:
 - Dictionaries: To send parameters to deploy and evaluate models/functions.
