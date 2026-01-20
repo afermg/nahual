@@ -165,6 +165,7 @@ def get_output_signature(name: str) -> tuple[str, str]:
         "vit": ("dict", "numpy"),
         "trackastra": ("dict", "dict"),
         "recursionpharma/OpenPhenom": ("dict", "numpy"),
+        "subcell": ("dict", "numpy"),
     }
 
     if name in OUTPUT_SIGNATURES:
