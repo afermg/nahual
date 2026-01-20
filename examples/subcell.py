@@ -10,9 +10,6 @@ from nahual.process import dispatch_setup_process
 
 setup, process = dispatch_setup_process("subcell")
 address = "ipc:///tmp/subcell.ipc"
-"""
-Run `nix develop --command bash -c "python server.py ipc:///tmp/subcell.ipc"` from the root directory of https://github.com/afermg/SubcellPortable.
-"""
 
 # %%Load models server-side
 parameters = dict(model_type="mae_contrast_supcon_model", model_channels="rybg")
