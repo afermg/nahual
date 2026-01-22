@@ -22,5 +22,8 @@ response = setup(parameters, address=address)
 
 # %% Define custom data
 tile_size = 256
-data = numpy.random.random_sample((2, 6, 1, tile_size, tile_size))
+
+# channel can be < 6 and the model will pad
+input_shape = (2, 6, 1, tile_size, tile_size)
+data = numpy.random.random_sample(input_shape)
 result = process(data, address=address)
