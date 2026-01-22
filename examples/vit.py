@@ -21,5 +21,6 @@ parameters = dict(model_name="recursionpharma/OpenPhenom")
 response = setup(parameters, address=address)
 
 # %% Define custom data
-data = numpy.random.random_sample((2, 6, 256, 256))
-result = process(data + 1000, address=address)
+tile_size = 256
+data = numpy.random.random_sample((2, 6, 1, tile_size, tile_size))
+result = process(data, address=address)
