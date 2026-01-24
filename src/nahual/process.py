@@ -160,19 +160,21 @@ def get_output_signature(name: str) -> tuple[str, str]:
     ('dict', 'numpy')
     """
     OUTPUT_SIGNATURES = {
+        # "CaicedoLab/MorphEm": ("dict", "numpy"),
         "cellpose": ("dict", "numpy"),
         "dinov2": ("dict", "numpy"),
-        "vit": ("dict", "numpy"),
-        "trackastra": ("dict", "dict"),
         "recursionpharma/OpenPhenom": ("dict", "numpy"),
         "subcell": ("dict", "numpy"),
+        "trackastra": ("dict", "dict"),
+        "vit": ("dict", "numpy"),
     }
 
-    if name in OUTPUT_SIGNATURES:
-        signature = OUTPUT_SIGNATURES[name]
-    else:
-        # Use the prefix of the model
-        signature = OUTPUT_SIGNATURES[name.split("_")[0]]
+    # If not in list dict->numpy, which is the most common
+    signature = OUTPUT_SIGNATURES.get(name, ("dict", "numpy"))
+    if name not in OUTPUT_SIGNATURES:
+        print(
+            f"Model name {name} not explicitly defined as one of the signatures. Assuming (dict->numpy). Available values are {list(OUTPUT_SIGNATURES.keys())}"
+        )
 
     return signature
 
