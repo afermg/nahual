@@ -169,12 +169,13 @@ def get_output_signature(name: str) -> tuple[str, str]:
         "vit": ("dict", "numpy"),
     }
 
-    # If not in list dict->numpy, which is the most common
+    # IMPORTANT: If not in list dict->numpy, which is the most common
     signature = OUTPUT_SIGNATURES.get(name, ("dict", "numpy"))
-    if name not in OUTPUT_SIGNATURES:
-        print(
-            f"Model name {name} not explicitly defined as one of the signatures. Assuming (dict->numpy). Available values are {list(OUTPUT_SIGNATURES.keys())}"
-        )
+    # Temporarily emoved due to noisy output
+    # if name not in OUTPUT_SIGNATURES:
+    #     print(
+    #         f"Model name {name} not explicitly defined as one of the signatures. Assuming (dict->numpy). Available values are {list(OUTPUT_SIGNATURES.keys())}"
+    #     )
 
     return signature
 
