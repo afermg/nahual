@@ -17,7 +17,7 @@ I deployed tools using [Nix](https://nixos.org/).
 - [Cellpose](https://github.com/afermg/cellpose): Generalist segmentation model.
 - [DINOv2](https://github.com/afermg/dinov2): Generalist self-supervised model to obtain visual features.
 - [Trackastra](https://github.com/afermg/trackastra): Transformer-based tracking trained on a multitude of datasets.
-- [ViT](https://github.com/afermg/nahual_vit): HuggingFace's Visual Transformers models (e.g., [OpenPhenom](https://huggingface.co/recursionpharma/OpenPhenom)). 
+- [ViT](https://github.com/afermg/nahual_vit): HuggingFace's Visual Transformers model. [OpenPhenom](https://huggingface.co/recursionpharma/OpenPhenom), [MorphEM](https://huggingface.co/CaicedoLab/MorphEm). 
 - [SubCell](https://github.com/afermg/SubCellPortable): Encoder of single cell morphology and protein localisation.
 - [DINOv3](https://github.com/afermg/dinov3): Generalist self-supervised model, latest iteration.
 
