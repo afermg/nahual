@@ -3,9 +3,9 @@
 import numpy
 
 
-def validate_input_shape(input_zyx: tuple[int], expected_zyx: tuple[int]):
-    assert tuple(input_zyx) == expected_zyx, (
-        f"Invalid input shape {input_zyx}. Last dims should be {expected_zyx}, not {input_zyx}"
+def validate_input_shape(input_yx: tuple[int], expected_tile_size: tuple[int]):
+    assert all((x % expected_tile_size == 0) for x in input_yx), (
+        f"Invalid input shape {input_yx}. Last dims should be divisible by {expected_tile_size}"
     )
 
 

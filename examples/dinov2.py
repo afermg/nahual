@@ -1,3 +1,4 @@
+# +/usr/bin/env python
 """
 This example uses a server within the environment defined on `https://github.com/afermg/dinov2.git`.
 
@@ -20,5 +21,6 @@ response = setup(parameters, address=address)
 
 # %% Define custom data
 # Added z-dimension
-data = numpy.random.random_sample((2, 3, 1, 420, 420))
+tile_size = 224  # multiples of 14
+data = numpy.random.random_sample((2, 3, 1, tile_size, tile_size))
 result = process(data, address=address)

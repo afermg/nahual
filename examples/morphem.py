@@ -1,7 +1,7 @@
 """
 This example uses a server within the environment defined on `https://github.com/afermg/nahual_vit.git`.
 
-Run `nix develop --command bash -c "python server.py ipc:///tmp/openphenom.ipc"` from the root directory of that repository.
+Run `nix develop --command bash -c "python src/vit/morphem.py ipc:///tmp/morphem.ipc"` from the root directory of that repository.
 """
 
 import numpy
@@ -9,15 +9,10 @@ import numpy
 from nahual.process import dispatch_setup_process
 
 setup, process = dispatch_setup_process("vit")
-address = "ipc:///tmp/vit.ipc"
-"""
-Run Visual Transformers using the HuggingFace's transformers library.
-
-Run `nix develop --command bash -c "python src/vit/server.py ipc:///tmp/vit.ipc"` from the root directory of https://github.com/afermg/nahual_vit.
-"""
+address = "ipc:///tmp/morphem.ipc"
 
 # %%Load models server-side
-parameters = dict(model_name="recursionpharma/OpenPhenom")
+parameters = dict(model_name="CaicedoLab/MorphEm")
 response = setup(parameters, address=address)
 
 # %% Define custom data
