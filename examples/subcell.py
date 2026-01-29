@@ -12,7 +12,11 @@ setup, process = dispatch_setup_process("subcell")
 address = "ipc:///tmp/subcell.ipc"
 
 # %%Load models server-side
-parameters = dict(model_type="mae_contrast_supcon_model", model_channels="rybg")
+parameters = dict(
+    model_type="mae_contrast_supcon_model",
+    model_channels="rybg",
+    # device=0, # optional
+)
 response = setup(parameters, address=address)
 
 # %% Define custom data

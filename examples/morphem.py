@@ -12,7 +12,10 @@ setup, process = dispatch_setup_process("vit")
 address = "ipc:///tmp/morphem.ipc"
 
 # %%Load models server-side
-parameters = dict(model_name="CaicedoLab/MorphEm")
+parameters = dict(
+    model_name="CaicedoLab/MorphEm",
+    # device=0, # optional
+)
 response = setup(parameters, address=address)
 
 # %% Define custom data
