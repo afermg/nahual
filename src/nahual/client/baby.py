@@ -116,9 +116,13 @@ def process_data(
     pixels: np.ndarray,
     address: str,
     session_id: str,
-    channel_to_segment:int,
+    channel_to_segment: int,
     input_dimorder: str = "NZYX",
-    extra_args:tuple[tuple[str,tuple[str,str]]]=(("refine_outlines", ("", "true")), ("with_edgemasks", ("", "true")), ("with_masks", ("", "true"))),
+    extra_args: tuple[tuple[str, tuple[str, str]]] = (
+        ("refine_outlines", ("", "true")),
+        ("with_edgemasks", ("", "true")),
+        ("with_masks", ("", "true")),
+    ),
 ) -> list[dict[str, np.ndarray]]:
     """Sends image data to a baby-phone server session for segmentation.
 
@@ -169,14 +173,16 @@ def process_data(
     `pixels`) must be in a fixed order.
     """
     pixels = pixels[:, channel_to_segment]
-    
+
     # Convert to uint8
     # TODO check if BABY supports uint16
     if pixels.dtype == np.uint16:
         pixels = ((pixels / 65536) * 256).astype(np.uint8)
 
     # Convert from the input format to NYXZ
-    reordered = reorder_dims(pixels, input_dimorder=input_dimorder, output_dimorder="NYXZ")
+    reordered = reorder_dims(
+        pixels, input_dimorder=input_dimorder, output_dimorder="NYXZ"
+    )
     # Initiate a multipart-encoded request
     requests.post(
         f"{address}/segment?sessionid={session_id}",
@@ -205,12 +211,12 @@ def process_data(
 
     pertile_nyx = []
     pertile_layers = []
-    
+
     for tile in edgemask_labels:
         labels = tile["cell_label"]
-        
+
         nyx = np.zeros((0, *pixels.shape[1:3]), dtype=int)
-        if len(labels): # Cover case of tiles 
+        if len(labels):  # Cover case of tiles
             edgemasks = tile["edgemasks"]
             masks = tile["masks"]
             xs_max = [max(m[0]) for m in edgemasks]
@@ -231,12 +237,11 @@ def process_data(
             # Place the cells back in their corresponding layer
             # [[max(m) for m in mask_set] for mask_set in masks]
             for object_index, layer in mapper_label_layer.items():
-                x,y = np.array(masks[object_index])-1
-                nyx[layer,x-1,y-1] = labels[object_index]
-            
+                x, y = np.array(masks[object_index]) - 1
+                nyx[layer, x - 1, y - 1] = labels[object_index]
+
         pertile_nyx.append(nyx)
 
-    
     return pertile_nyx
 
 
@@ -268,9 +273,9 @@ def reorder_dims(
     ValueError
         If dimension orders are invalid or incompatible with the array shape.
     """
-    assert sorted(input_dimorder) == sorted(
-        output_dimorder
-    ), "The strings must be permutations of each other"
+    assert sorted(input_dimorder) == sorted(output_dimorder), (
+        "The strings must be permutations of each other"
+    )
     axes_permutation = [input_dimorder.index(dim) for dim in output_dimorder]
 
     return np.transpose(img, axes_permutation)
@@ -287,9 +292,9 @@ def matrix_to_edgemasks(arr: np.ndarray) -> list[tuple[int, int]]:
 
 
 def overlap_from_edgemasks(edgemasks: list[np.ndarray]) -> list[tuple[int, int]]:
-    edges = np.asarray(
-        [(np.min(edge_set, axis=1), np.max(edge_set, axis=1)) for edge_set in edgemasks]
-    )
+    edges = np.asarray([
+        (np.min(edge_set, axis=1), np.max(edge_set, axis=1)) for edge_set in edgemasks
+    ])
     # Masking can probably occur with a matrix of a specific shape
     # For now I will do iteration
     overlaps = []
@@ -308,46 +313,50 @@ def overlap_from_edgemasks(edgemasks: list[np.ndarray]) -> list[tuple[int, int]]
 
     return overlaps
 
-def generate_adjacency_from_overlapping(overlapping_indices) -> list[tuple[int,int]]:
+
+def generate_adjacency_from_overlapping(overlapping_indices) -> list[tuple[int, int]]:
     """
     The input is the object labels for overlapping indices.
     The output is a tuple where the first value are the unique indices (from the input) and the output is an adjacency list representation (lists with all the connected nodes.).
     """
     unique_indices = sorted(set([y for x in overlapping_indices for y in x]))
     n_nodes = len(unique_indices)
-    adjacency_graph = [[] for _ in  range(n_nodes)]
-    for (node1, node2) in overlapping_indices:
+    adjacency_graph = [[] for _ in range(n_nodes)]
+    for node1, node2 in overlapping_indices:
         adjacency_graph[unique_indices.index(node1)].append(unique_indices.index(node2))
         adjacency_graph[unique_indices.index(node2)].append(unique_indices.index(node1))
-        
+
     return unique_indices, adjacency_graph
-    
-def get_layers_from_edgemasks(edgemasks:list[np.ndarray])->list[int,int]:
+
+
+def get_layers_from_edgemasks(edgemasks: list[np.ndarray]) -> list[int, int]:
     """Produces a dictionary that determines the how to distribute labels across multiple stacks so
     objects do not overlap. It outputs a dictionary with the original label and its corresponding layer.
 
     NOTE: This uses the DSatur algorithm, which will not scales well as overlaps increase in number.
     """
-    if not len(edgemasks): # Cover empty case
+    if not len(edgemasks):  # Cover empty case
         return {}
-    
+
     overlapping_indices = overlap_from_edgemasks(edgemasks)
 
     # Convert list of overlapping indices into adjacency graph
-    unique_indices, adjacency_graph = generate_adjacency_from_overlapping(overlapping_indices)
+    unique_indices, adjacency_graph = generate_adjacency_from_overlapping(
+        overlapping_indices
+    )
 
     # Case where there are no overlapping
-    layers_d = {object_label:0 for object_label in range(len(edgemasks))}
+    layers_d = {object_label: 0 for object_label in range(len(edgemasks))}
     if not len(adjacency_graph):
         return layers_d
-    
+
     # Use a colouring algorithm to find the smallest number of stacks needed to represent all cells
     layers = dsatur(adjacency_graph)
 
     n_layers = max(len(layers), 1)
     # Place all objects on the bottom layer
     # Overwrite the overlapping ones
-    for i,layer in enumerate(layers):
+    for i, layer in enumerate(layers):
         layers_d[unique_indices[i]] = layer
 
     return layers_d
@@ -355,41 +364,39 @@ def get_layers_from_edgemasks(edgemasks:list[np.ndarray])->list[int,int]:
 
 def get_edgemasks_case(kind) -> np.ndarray:
     # tiny 6×6 label image
-    
+
     empty = np.array([], dtype=int)
-    zeros = np.zeros((6,6), dtype=int)
-    non_overlap = np.array(
-        [
-            [0, 0, 1, 1, 0, 0],
-            [0, 0, 1, 1, 0, 0],
-            [2, 2, 2, 0, 0, 0],
-            [2, 0, 2, 3, 3, 3],
-            [2, 2, 2, 3, 0, 3],
-            [0, 0, 0, 3, 3, 3],
-        ]
-    )
-    overlap = np.array(
-        [
-            [0, 0, 1, 1, 0, 0],
-            [0, 0, 1, 1, 0, 0],
-            [2, 2, 2, 2, 0, 0],
-            [2, 0, 0, 3, 3, 3],
-            [2, 2, 2, 3, 0, 3],
-            [0, 0, 0, 3, 3, 3],
-        ]
-    )
+    zeros = np.zeros((6, 6), dtype=int)
+    non_overlap = np.array([
+        [0, 0, 1, 1, 0, 0],
+        [0, 0, 1, 1, 0, 0],
+        [2, 2, 2, 0, 0, 0],
+        [2, 0, 2, 3, 3, 3],
+        [2, 2, 2, 3, 0, 3],
+        [0, 0, 0, 3, 3, 3],
+    ])
+    overlap = np.array([
+        [0, 0, 1, 1, 0, 0],
+        [0, 0, 1, 1, 0, 0],
+        [2, 2, 2, 2, 0, 0],
+        [2, 0, 0, 3, 3, 3],
+        [2, 2, 2, 3, 0, 3],
+        [0, 0, 0, 3, 3, 3],
+    ])
 
     overlap_edgemasks = matrix_to_edgemasks(overlap)
     # Add overlaps here
-    overlap_edgemasks[1] = np.concatenate((overlap_edgemasks[1], ((3, 4), (3, 3))), axis=1)
+    overlap_edgemasks[1] = np.concatenate(
+        (overlap_edgemasks[1], ((3, 4), (3, 3))), axis=1
+    )
 
     examples = {
         "empty": empty,
         "zeros": zeros,
         "no_overlap": non_overlap,
     }
-    examples = {k:matrix_to_edgemasks(v) for k,v in examples.items()}
-    examples["overlap"] =  overlap_edgemasks
+    examples = {k: matrix_to_edgemasks(v) for k, v in examples.items()}
+    examples["overlap"] = overlap_edgemasks
     return examples[kind]
 
 
@@ -452,6 +459,7 @@ def run_sample(
 
     return output
 
+
 # Now we need to cover for empty cases to count the number of layers in the new dimension:
 # Let N be the number of overlapping layers
 # Overlapping and non-overlapping: N
@@ -467,7 +475,6 @@ def run_sample(
 # %%
 # for case_ in ("overlap", "no_overlap", "zeros", "empty"):
 #     if case_=="zeros":
-#         breakpoint()
 #     example = get_edgemasks_case(case_)
 #     layers = get_layers_from_edgemasks(example)
 #     print(f"{case_}: {layers}")
@@ -477,5 +484,4 @@ def run_sample(
 # masks = np.zeros((max_size+1,max_size+1), dtype=int)
 # for object_id, (xcoords, ycoords) in enumerate(example, 1):
 #     for x,y in zip(xcoords, ycoords):
-        # masks[x,y] = object_id
-
+# masks[x,y] = object_id

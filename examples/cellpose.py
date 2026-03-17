@@ -1,4 +1,4 @@
-# +/usr/bin/env python
+# /usr/bin/env python
 """
 This example uses a server within the environment defined on `https://github.com/afermg/dinov2.git`.
 
