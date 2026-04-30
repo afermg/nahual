@@ -22,7 +22,6 @@ I deployed tools using [Nix](https://nixos.org/).
 - [SubCell](https://github.com/afermg/SubCellPortable): Encoder of single cell morphology and protein localisation.
 - [scDINO](https://github.com/afermg/scDINO): Self-supervised vision transformers for multi-channel single-cell images (DINO-style ViT-S/B).
 - [ChannelSFormer](https://github.com/afermg/ChannelSFormer): Channel-agnostic vision transformer for multi-channel cell-painting images (insitro).
-- [cytoself](https://github.com/afermg/cytoself): Self-supervised VQ-VAE encoder for protein localization patterns.
 - [CellDino](https://github.com/afermg/CellDino): MaskDINO-based cell tracking/segmentation backbone (ResNet/Swin features).
 - [DeepProfiler (CPCNNv1)](https://github.com/afermg/DeepProfiler): TensorFlow-based morphological profiler (ResNet50V2 ImageNet features).
 - [CellWhisperer](https://github.com/afermg/CellWhisperer): Multimodal scRNA-seq + language model (gene-expression encoder).
