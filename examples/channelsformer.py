@@ -9,7 +9,7 @@ import numpy
 
 from nahual.process import dispatch_setup_process
 
-setup, process = dispatch_setup_process("channelsformer")
+setup, process = dispatch_setup_process("channelsformer", signature=("dict", "numpy"))
 address = "ipc:///tmp/channelsformer.ipc"
 
 # %% Load model server-side
@@ -21,7 +21,7 @@ parameters = {
     "depth": 12,
     "num_heads": 6,
     # optional
-    # "device": 0,
+    # "device": 0,  # CUDA device index, defaults to 0
     # "weights": "/path/to/checkpoint.pth",
 }
 response = setup(parameters, address=address)
