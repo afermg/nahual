@@ -22,9 +22,15 @@ I deployed tools using [Nix](https://nixos.org/).
 - [SubCell](https://github.com/afermg/SubCellPortable): Encoder of single cell morphology and protein localisation.
 - [scDINO](https://github.com/afermg/scDINO): Self-supervised vision transformers for multi-channel single-cell images (DINO-style ViT-S/B).
 - [ChannelSFormer](https://github.com/afermg/ChannelSFormer): Channel-agnostic vision transformer for multi-channel cell-painting images (insitro).
-- [CellDino](https://github.com/afermg/CellDino): MaskDINO-based cell tracking/segmentation backbone (ResNet/Swin features).
 - [DeepProfiler (CPCNNv1)](https://github.com/afermg/DeepProfiler): TensorFlow-based morphological profiler (ResNet50V2 ImageNet features).
 - [CellWhisperer](https://github.com/afermg/CellWhisperer): Multimodal scRNA-seq + language model (gene-expression encoder).
+
+## Considered but not wrapped
+
+A few well-known models were evaluated and excluded; the reasoning is recorded here so it doesn't have to be re-discovered:
+
+- **Cytoself** ([royerlab/cytoself](https://github.com/royerlab/cytoself)) — VQ-VAE encoder. Its primary feature output is a spatial token grid `(N, 64, H, W)` (e.g. `(N, 64, 4, 4)` from `vqvec2`, or `(N, 64, 25, 25)` from `vqvec1`) rather than a 2-D embedding. We want a flat `(N, D)` interface across the model zoo, and reducing the spatial map (avg/max pool, flatten) discards information the VQ-VAE was trained to preserve. The fork [afermg/cytoself](https://github.com/afermg/cytoself) exists but is not in the supported list.
+- **CellDino** ([liaowei6/CellDino](https://github.com/liaowei6/CellDino)) — Mask-DINO-based instance-segmentation + tracking model. The full inference path returns `dict(pred_masks, pred_logits, pred_boxes, pred_track_ids)`, not an embedding, and depends on a CUDA-compiled `MSDeformAttn` op plus `mmcv` extensions that are non-trivial to package under Nix. The fork [afermg/CellDino](https://github.com/afermg/CellDino) currently ships only a backbone-only scaffold; the full segmentation pipeline is out of scope for the embedding-extraction interface this project targets.
 
 ## Usage
 ### Step 1: Deploy server
