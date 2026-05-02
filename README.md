@@ -24,6 +24,14 @@ I deployed tools using [Nix](https://nixos.org/).
 - [ChannelSFormer](https://github.com/afermg/ChannelSFormer): Channel-agnostic vision transformer for multi-channel cell-painting images (insitro).
 - [DeepProfiler (CPCNNv1)](https://github.com/afermg/DeepProfiler): TensorFlow-based morphological profiler (ResNet50V2 ImageNet features).
 - [CellWhisperer](https://github.com/afermg/CellWhisperer): Multimodal scRNA-seq + language model (gene-expression encoder).
+- [StarDist](https://github.com/afermg/stardist): Star-convex polygon segmentation (TensorFlow backend, GPU).
+- [EmbedSeg](https://github.com/afermg/EmbedSeg): Embedding-based instance segmentation (PyTorch).
+- [InstanSeg](https://github.com/afermg/instanseg): Fast cell segmentation across biomarkers (PyTorch).
+- [MegaSeg](https://github.com/afermg/allencell-segmenter-ml): Allen Institute MegaSegmenter — 3-D cell segmentation (cyto-dl, MONAI), Hydra/napari-free inference path.
+- [MicroSAMs](https://github.com/afermg/micro-sam): SAM-based automatic instance segmentation tuned on microscopy data. All conda-only deps (vigra, nifty, affogato, torch_em, python-elf) are now packaged as proper Nix derivations.
+- [CellSAM](https://github.com/afermg/cellSAM): Foundation model for cell segmentation. Requires `DEEPCELL_ACCESS_TOKEN` (issued at https://users.deepcell.org) to fetch weights.
+- [Ultrack](https://github.com/afermg/ultrack): ILP-based tracking + segmentation. The tracking core is CPU-bound (CBC/CLP solver); optional torch detection nets are GPU-capable.
+- [BioImage Model Zoo](https://github.com/afermg/nahual_bioimageio): Generic loader — one server, any RDF (DOI / Zenodo URL / nickname like `affable-shark` / local rdf.yaml). Variants: `apps.default` (ONNX/TorchScript), `apps.with-stardist`, `apps.with-careamics`, `apps.with-monai`.
 
 ## Considered but not wrapped
 
