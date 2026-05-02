@@ -11,27 +11,38 @@ Potential solution: I figured that if we can move parameters and numpy arrays be
 Thus the goal of this tool is provide a way to deploy model(s) in one (or many) environments, and access them from another one, usually an orchestrator.
 
 ## Available models and tools 
-I deployed tools using [Nix](https://nixos.org/).
+I deployed tools using [Nix](https://nixos.org/). Within each category the wraps authored by hand are listed first; LLM-assisted wraps follow.
 
-- [BABY](https://github.com/afermg/baby): Segmentation, tracking and lineage assignment for budding yeast.
-- [Cellpose](https://github.com/afermg/cellpose): Generalist segmentation model.
+### Embeddings / feature extraction
+
 - [DINOv2](https://github.com/afermg/dinov2): Generalist self-supervised model to obtain visual features.
 - [DINOv3](https://github.com/afermg/dinov3): Generalist self-supervised model, latest iteration.
-- [Trackastra](https://github.com/afermg/trackastra): Transformer-based tracking trained on a multitude of datasets.
 - [ViT](https://github.com/afermg/nahual_vit): HuggingFace's Visual Transformers model. [OpenPhenom](https://huggingface.co/recursionpharma/OpenPhenom), [MorphEM](https://huggingface.co/CaicedoLab/MorphEm).
 - [SubCell](https://github.com/afermg/SubCellPortable): Encoder of single cell morphology and protein localisation.
 - [scDINO](https://github.com/afermg/scDINO): Self-supervised vision transformers for multi-channel single-cell images (DINO-style ViT-S/B).
 - [ChannelSFormer](https://github.com/afermg/ChannelSFormer): Channel-agnostic vision transformer for multi-channel cell-painting images (insitro).
 - [DeepProfiler (CPCNNv1)](https://github.com/afermg/DeepProfiler): TensorFlow-based morphological profiler (ResNet50V2 ImageNet features).
 - [CellWhisperer](https://github.com/afermg/CellWhisperer): Multimodal scRNA-seq + language model (gene-expression encoder).
+
+### Segmentation
+
+- [BABY](https://github.com/afermg/baby): Segmentation, tracking and lineage assignment for budding yeast.
+- [Cellpose](https://github.com/afermg/cellpose): Generalist segmentation model.
 - [StarDist](https://github.com/afermg/stardist): Star-convex polygon segmentation (TensorFlow backend, GPU).
 - [EmbedSeg](https://github.com/afermg/EmbedSeg): Embedding-based instance segmentation (PyTorch).
 - [InstanSeg](https://github.com/afermg/instanseg): Fast cell segmentation across biomarkers (PyTorch).
 - [MegaSeg](https://github.com/afermg/allencell-segmenter-ml): Allen Institute MegaSegmenter — 3-D cell segmentation (cyto-dl, MONAI), Hydra/napari-free inference path.
-- [MicroSAMs](https://github.com/afermg/micro-sam): SAM-based automatic instance segmentation tuned on microscopy data. All conda-only deps (vigra, nifty, affogato, torch_em, python-elf) are now packaged as proper Nix derivations.
+- [MicroSAMs](https://github.com/afermg/micro-sam): SAM-based automatic instance segmentation tuned on microscopy data. All conda-only deps (vigra, nifty, affogato, torch_em, python-elf) are packaged as proper Nix derivations.
 - [CellSAM](https://github.com/afermg/cellSAM): Foundation model for cell segmentation. Requires `DEEPCELL_ACCESS_TOKEN` (issued at https://users.deepcell.org) to fetch weights.
+
+### Tracking
+
+- [Trackastra](https://github.com/afermg/trackastra): Transformer-based tracking trained on a multitude of datasets.
 - [Ultrack](https://github.com/afermg/ultrack): ILP-based tracking + segmentation. The tracking core is CPU-bound (CBC/CLP solver); optional torch detection nets are GPU-capable.
-- [BioImage Model Zoo](https://github.com/afermg/nahual_bioimageio): Generic loader — one server, any RDF (DOI / Zenodo URL / nickname like `affable-shark` / local rdf.yaml). Variants: `apps.default` (ONNX/TorchScript), `apps.with-stardist`, `apps.with-careamics`, `apps.with-monai`.
+
+### Generic loaders
+
+- [BioImage Model Zoo](https://github.com/afermg/nahual_bioimageio): Single server fronting the entire BIMZ — pass the model identifier (DOI / Zenodo URL / nickname like `affable-shark` / local rdf.yaml) at `setup()` time. Variants: `apps.default` (ONNX/TorchScript), `apps.with-stardist`, `apps.with-careamics`, `apps.with-monai`.
 
 ## Considered but not wrapped
 
