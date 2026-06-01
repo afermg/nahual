@@ -38,6 +38,7 @@ All wraps are deployed with [Nix](https://nixos.org/) and run on GPU (`cuda:0` o
 | [MegaSeg](https://github.com/afermg/allencell-segmenter-ml) | `(N, 1, Z, Y, X)` uint8 | Allen Institute MegaSegmenter — 3-D, Hydra/napari-free inference. |
 | [micro-sam](https://github.com/afermg/micro-sam) | `(N, H, W)` int32 | SAM tuned for microscopy. All conda-only deps (vigra, nifty, affogato, torch_em, python-elf) packaged as proper Nix derivations. Cold-cache build ~30 min — pre-warm with `nix develop --impure --command true`. |
 | [CellSAM](https://github.com/afermg/cellSAM) | `(N, H, W)` int32 | ONNX-only foundation model, no auth. Backed by [keejkrej/cellsam-onnx](https://huggingface.co/keejkrej/cellsam-onnx); license is *Modified Apache 2.0, academic-only*. The original DeepCell-auth PyTorch path is preserved on the [`nahual-wrap-deepcell`](https://github.com/afermg/cellSAM/tree/nahual-wrap-deepcell) branch. |
+| [Spotiflow](https://github.com/afermg/spotiflow/tree/nahual-wrap) | `(N, H, W)` int32 label mask, one disk per spot | Fluorescence-puncta detector ([Weigert lab](https://github.com/weigertlab/spotiflow)). Server rasterises Spotiflow's `(N, 2)` `(y, x)` centroid output into per-spot disks (configurable radius, default 3 px) so the result drops into any downstream cp_measure / skimage.measure pipeline that already consumes cellpose-style label masks. Default checkpoint: `general`. Pass `signature=("dict", "numpy")` to `dispatch_setup_process`. |
 
 ### Tracking
 
