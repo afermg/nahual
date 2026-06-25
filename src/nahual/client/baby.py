@@ -11,10 +11,23 @@ result = run_sample(address, modelset)
 
 """
 
+from contextvars import ContextVar
+
 import numpy as np
 import requests
 
 from nahual.utils import dsatur
+
+# Optional sink for per-tp per-tile lineage info. Callers that drive
+# process_data through aliby's pipeline (where return_with_lineage cannot be
+# threaded through) may set this to a list and read mother_assign / cell_label
+# out of it after the pipeline runs.
+_LINEAGE_SINK: ContextVar[list | None] = ContextVar("baby_lineage_sink", default=None)
+
+
+def set_lineage_sink(sink: list | None) -> None:
+    """Set (or clear) the per-call lineage sink. See process_data docs."""
+    _LINEAGE_SINK.set(sink)
 
 
 def list_sessions(address: str):
@@ -123,7 +136,9 @@ def process_data(
         ("with_edgemasks", ("", "true")),
         ("with_masks", ("", "true")),
     ),
-) -> list[dict[str, np.ndarray]]:
+    return_with_lineage: bool = False,
+    return_metadata: bool = False,
+) -> list[dict[str, np.ndarray]] | dict[str, list]:
     """Sends image data to a baby-phone server session for segmentation.
 
     This function sends a multipart-encoded POST request to the `/segment`
@@ -198,11 +213,35 @@ def process_data(
         ],
     )
 
-    # Request results
-    r = requests.get(f"{address}/segment?sessionid={session_id}")
-    if not r.ok:
+    # Poll for results. baby-phone returns 408 while segmentation is still
+    # running; we wait with linear backoff until the server returns 200 or we
+    # hit a generous deadline.
+    import time
+
+    poll_deadline = time.time() + 600
+    while True:
+        r = requests.get(f"{address}/segment?sessionid={session_id}")
+        if r.ok:
+            break
+        if r.status_code == 408 and time.time() < poll_deadline:
+            time.sleep(2)
+            continue
         raise Exception(f"{r.status_code}: {r.text}")
     outputs = r.json()
+
+    # Populate the optional lineage sink as early as possible so that the
+    # mother_assign / cell_label info is preserved even if mask reconstruction
+    # below raises on a malformed tile.
+    sink = _LINEAGE_SINK.get()
+    passthrough_keys = ("cell_label", "mother_assign", "edgemasks", "volumes")
+    per_tile_lineage = None
+    if sink is not None or return_with_lineage or return_metadata:
+        per_tile_lineage = [
+            {k: out_pertile[k] for k in passthrough_keys if k in out_pertile}
+            for out_pertile in outputs
+        ]
+        if sink is not None:
+            sink.append(per_tile_lineage)
 
     edgemask_labels = [
         {k: out_pertile[k] for k in ("edgemasks", "cell_label", "masks")}
@@ -215,7 +254,10 @@ def process_data(
     for tile in edgemask_labels:
         labels = tile["cell_label"]
 
-        nyx = np.zeros((0, *pixels.shape[1:3]), dtype=int)
+        # pixels here is shape (N, Z, Y, X) after channel selection — empty
+        # tiles must keep the trailing Y/X axes consistent so downstream
+        # writers can stack masks across tiles.
+        nyx = np.zeros((0, *pixels.shape[-2:]), dtype=int)
         if len(labels):  # Cover case of tiles
             edgemasks = tile["edgemasks"]
             masks = tile["masks"]
@@ -241,6 +283,36 @@ def process_data(
                 nyx[layer, x - 1, y - 1] = labels[object_index]
 
         pertile_nyx.append(nyx)
+
+    if return_metadata:
+        # Split-shape return for aliby's pipe_baby pipeline: masks feed the
+        # extract step (`_init_extract(overlap=True)`) which expects per-tile
+        # layered ``(N_layers, Y, X)`` arrays; metadata feeds the
+        # `_save_baby_tracking_lineage` post-state hook. We deliberately
+        # bypass the max-collapse below — overlap-aware downstream consumers
+        # need the layer axis intact.
+        metadata = [
+            {k: tile_meta[k] for k in ("cell_label", "mother_assign") if k in tile_meta}
+            for tile_meta in per_tile_lineage
+        ]
+        return {"masks": pertile_nyx, "metadata": metadata}
+
+    # Flatten the layer axis: downstream tools (aliby, cp_measure, skimage)
+    # consistently expect a 2D label image per tile. The DSatur layer
+    # encoding is only meaningful when overlapping cells must be preserved;
+    # for the typical non-overlap case (and even with overlap, since later
+    # writers can't represent it anyway), max-collapsing produces a valid
+    # single-label image. Empty tiles keep their (0, Y, X) shape so a
+    # subsequent np.zeros allocation downstream still works.
+    pertile_nyx = [
+        nyx.max(axis=0) if nyx.shape[0] > 0 else np.zeros(nyx.shape[-2:], dtype=int)
+        for nyx in pertile_nyx
+    ]
+
+    if return_with_lineage and per_tile_lineage is not None:
+        for nyx, entry in zip(pertile_nyx, per_tile_lineage):
+            entry["masks"] = nyx
+        return per_tile_lineage
 
     return pertile_nyx
 
@@ -292,9 +364,9 @@ def matrix_to_edgemasks(arr: np.ndarray) -> list[tuple[int, int]]:
 
 
 def overlap_from_edgemasks(edgemasks: list[np.ndarray]) -> list[tuple[int, int]]:
-    edges = np.asarray([
-        (np.min(edge_set, axis=1), np.max(edge_set, axis=1)) for edge_set in edgemasks
-    ])
+    edges = np.asarray(
+        [(np.min(edge_set, axis=1), np.max(edge_set, axis=1)) for edge_set in edgemasks]
+    )
     # Masking can probably occur with a matrix of a specific shape
     # For now I will do iteration
     overlaps = []
@@ -353,7 +425,6 @@ def get_layers_from_edgemasks(edgemasks: list[np.ndarray]) -> list[int, int]:
     # Use a colouring algorithm to find the smallest number of stacks needed to represent all cells
     layers = dsatur(adjacency_graph)
 
-    n_layers = max(len(layers), 1)
     # Place all objects on the bottom layer
     # Overwrite the overlapping ones
     for i, layer in enumerate(layers):
@@ -367,22 +438,26 @@ def get_edgemasks_case(kind) -> np.ndarray:
 
     empty = np.array([], dtype=int)
     zeros = np.zeros((6, 6), dtype=int)
-    non_overlap = np.array([
-        [0, 0, 1, 1, 0, 0],
-        [0, 0, 1, 1, 0, 0],
-        [2, 2, 2, 0, 0, 0],
-        [2, 0, 2, 3, 3, 3],
-        [2, 2, 2, 3, 0, 3],
-        [0, 0, 0, 3, 3, 3],
-    ])
-    overlap = np.array([
-        [0, 0, 1, 1, 0, 0],
-        [0, 0, 1, 1, 0, 0],
-        [2, 2, 2, 2, 0, 0],
-        [2, 0, 0, 3, 3, 3],
-        [2, 2, 2, 3, 0, 3],
-        [0, 0, 0, 3, 3, 3],
-    ])
+    non_overlap = np.array(
+        [
+            [0, 0, 1, 1, 0, 0],
+            [0, 0, 1, 1, 0, 0],
+            [2, 2, 2, 0, 0, 0],
+            [2, 0, 2, 3, 3, 3],
+            [2, 2, 2, 3, 0, 3],
+            [0, 0, 0, 3, 3, 3],
+        ]
+    )
+    overlap = np.array(
+        [
+            [0, 0, 1, 1, 0, 0],
+            [0, 0, 1, 1, 0, 0],
+            [2, 2, 2, 2, 0, 0],
+            [2, 0, 0, 3, 3, 3],
+            [2, 2, 2, 3, 0, 3],
+            [0, 0, 0, 3, 3, 3],
+        ]
+    )
 
     overlap_edgemasks = matrix_to_edgemasks(overlap)
     # Add overlaps here
