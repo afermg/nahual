@@ -118,7 +118,7 @@ To reduce maintenance burden, we support only the necessary data types:
 - Numpy arrays (and numpy-able lists/tuples): The main type of data we deal with.
 
 ### Tech stack 
-- Model/tool deployment I use [Nix](https://nixos.org/), and at the moment do not plan to support containers. The logic behind  gives me unique guarantees of reproducibility, whilst allowing me to use bleeding edge models and libraries.
+- For model/tool deployment I use [Nix](https://nixos.org/), which gives me unique guarantees of reproducibility while allowing me to use bleeding-edge models and libraries. Implementation of OCI container support is coming.
 - Transport layer I use [pynng](github.com/codypiersall/pynng), I like that it is very minimalistic and provides easy-to-reproduce [examples](https://github.com/codypiersall/pynng/tree/7fd3d76573c3cb40c1e5f7e10d4a6091e411b9c2/examples). An alternative would have been `gRPC` + `protobuf`, but since I am trying to understand the constraints and tradeoffs I do not want to commit to a big framework unless I have a compelling reason to do so.
 
 ## Adding support for new models
@@ -128,7 +128,7 @@ Any model requires a thin layer that communicates using [nng](https://github.com
 - Formalize supported packet formats: (e.g., numpy arrays, dictionary).
 - Document server-side API.
 - Integrate into the [aliby](github.com/afermg/aliby) pipelining framework, in a way that is agnostic to which model is being used.
-- Support containers that wrap the Nix derivations.
+- Implement OCI containers that wrap the Nix derivations.
 
 ## Why nahual?
 In Mesoamerican folklore, a Nahual is a shaman able to transform into different animals.
