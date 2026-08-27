@@ -179,6 +179,7 @@ def get_output_signature(name: str) -> tuple[str, str]:
         "subcell": ("dict", "numpy"),
         "trackastra": ("dict", "dict"),
         "ultrack": ("dict", "numpy"),
+        "unidino": ("dict", "numpy"),
         "vit": ("dict", "numpy"),
     }
 

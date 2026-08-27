@@ -23,6 +23,7 @@ All wraps are deployed with [Nix](https://nixos.org/) and run on GPU (`cuda:0` o
 | [ViT](https://github.com/afermg/nahual_vit) | `(N, 384)` (OpenPhenom); `(N, 384 × C)` (MorphEm, per-channel cls concatenated) | HuggingFace ViTs incl. [OpenPhenom](https://huggingface.co/recursionpharma/OpenPhenom) and [MorphEM](https://huggingface.co/CaicedoLab/MorphEm). |
 | [SubCell](https://github.com/afermg/SubCellPortable) | `(N, 1536)` | Single-cell morphology + protein-localisation encoder. |
 | [scDINO](https://github.com/afermg/scDINO) | `(N, 384)` | Self-supervised ViT-S/B for multi-channel single-cell images. |
+| [uniDINO](https://github.com/afermg/uniDINO) | `(N, 384 × C)` | Assay-independent fluorescence-microscopy ViT. Each channel is embedded independently with the shared single-channel backbone, then the cls tokens are concatenated in channel order. Released weights are separately licensed CC BY-NC-ND 4.0 (non-commercial, no derivatives) and are not bundled. |
 | [ChannelSFormer](https://github.com/afermg/ChannelSFormer) | `(N, 384)` | Channel-agnostic ViT for cell-painting (insitro). |
 | [DeepProfiler (CPCNNv1)](https://github.com/afermg/DeepProfiler) | `(N, 2048 · ⌈C/3⌉)` | TensorFlow ResNet50V2 ImageNet morphological profiler. Same multi-pass channel handling as DINOv2/v3. |
 
