@@ -1,12 +1,15 @@
 """Run uniDINO through its Nahual server.
 
-Start the server first:
+Start the lightweight server first:
 
     nix run github:afermg/uniDINO -- ipc:///tmp/unidino.ipc
 
-The released checkpoint is not bundled. Download and extract it from
-https://doi.org/10.5281/zenodo.14988837, then pass its absolute path below.
-Omit ``weights`` only for a random-weight smoke test.
+With ``pretrained=True``, the server downloads the official Zenodo checkpoint
+once and caches the verified file through Pooch. Alternatively, put the
+checkpoint in the Nix store before serving it:
+
+    nix run github:afermg/uniDINO#pretrained -- ipc:///tmp/unidino.ipc
+The weights are separately licensed CC BY-NC-ND 4.0.
 """
 
 import numpy
@@ -16,9 +19,12 @@ from nahual.process import dispatch_setup_process
 setup, process = dispatch_setup_process("unidino")
 address = "ipc:///tmp/unidino.ipc"
 
-# %% Load the single-channel ViT-S/16 server-side.
+# %% Load the official single-channel ViT-S/16 teacher backbone.
+# `cache=True` is the default, but is explicit to make the behavior visible.
 parameters = {
-    # "weights": "/absolute/path/to/checkpoints/uniDINO.pth",
+    "pretrained": True,
+    "cache": True,
+    # "cache_dir": "/custom/cache/directory",
     # "device": 0,
 }
 response = setup(parameters, address=address)
