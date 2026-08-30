@@ -103,6 +103,65 @@ data = numpy.random.random_sample((1, 3, 420, 420))
 result = process(data + 1000, address=address)
 ```
 
+### Optional local shared-memory data plane
+
+For a client and server on the same Linux host, NumPy process calls can opt into
+shared memory while NNG remains the control transport:
+
+```python
+result = process(data, address=address, shared_memory=True)
+```
+
+This stages an ordinary NumPy input into a per-call client-owned segment. The
+server receives a synchronous, read-only borrowed view, and may reuse that
+segment for a fitting output. Nahual always returns an owning NumPy result and
+cleans up its segment. Setup dictionaries, parameters, model information,
+errors, and the small shared-memory descriptor continue to travel over NNG.
+
+When an upstream producer can fill shared memory directly, install the optional
+Appose adapter:
+
+```bash
+pip install 'nahual[appose]>=0.0.11'
+```
+
+Both client and model server must use Nahual 0.0.11 or newer. Nix model
+wrappers pinned to an older Nahual revision must update that pin before this
+protocol can be used.
+
+```python
+import appose
+
+with appose.NDArray("float32", [1, 5, 1, 128, 128]) as shared_input:
+    view = shared_input.ndarray()
+    acquire_or_preprocess_directly_into(view)
+    result = process(
+        shared_input,
+        address=address,
+        shared_memory=True,
+        timeout_ms=-1,
+    )
+```
+
+Nahual borrows an Appose-owned input without staging, and never closes, unlinks,
+disposes, or overwrites it. Appose input v1 always returns the output through
+the ordinary NNG NumPy wire as an owning array. The caller must keep the input
+alive and must not mutate or reuse it until the synchronous call completes;
+`timeout_ms=-1` is required so a timeout cannot outlive that exclusive borrow.
+Copying an existing NumPy array into `shared_input.ndarray()` is still one full
+staging copy, so the largest gain comes when acquisition or preprocessing writes
+there directly. See [`examples/appose_local.py`](examples/appose_local.py).
+
+This is a **local shared-memory data plane with optional Appose-owned input
+buffers**, not an Appose transport or backend. It initially supports Linux
+CPython 3.9–3.13 and only `ipc://` endpoints with NumPy process input/output.
+The IPC endpoint and operating-system shared-memory permissions are a trusted
+same-user boundary; do not expose this mode to untrusted local clients.
+Processors must not retain the borrowed server-side input view. Appose
+`NDArray` is host memory, not CUDA memory: GPU models still copy input from host
+to device, although they can keep models and intermediate state resident on the
+GPU.
+
 You can press `C-c C-c` from the terminal where the server lives to kill it. We will also add a way to kill the server from within the client.
 
 ## Design decisions and details
@@ -120,7 +179,7 @@ To reduce maintenance burden, we support only the necessary data types:
 
 ### Tech stack 
 - For model/tool deployment I use [Nix](https://nixos.org/), which gives me unique guarantees of reproducibility while allowing me to use bleeding-edge models and libraries. Implementation of OCI container support is coming.
-- Transport layer I use [pynng](github.com/codypiersall/pynng), I like that it is very minimalistic and provides easy-to-reproduce [examples](https://github.com/codypiersall/pynng/tree/7fd3d76573c3cb40c1e5f7e10d4a6091e411b9c2/examples). An alternative would have been `gRPC` + `protobuf`, but since I am trying to understand the constraints and tradeoffs I do not want to commit to a big framework unless I have a compelling reason to do so.
+- Transport layer I use [pynng](github.com/codypiersall/pynng), I like that it is very minimalistic and provides easy-to-reproduce [examples](https://github.com/codypiersall/pynng/tree/7fd3d76573c3cb40c1e5f7e10d4a6091e411b9c2/examples). NNG remains the standard transport even when the optional local shared-memory data plane is enabled. An alternative would have been `gRPC` + `protobuf`, but since I am trying to understand the constraints and tradeoffs I do not want to commit to a big framework unless I have a compelling reason to do so.
 
 ## Adding support for new models
 Any model requires a thin layer that communicates using [nng](https://github.com/nanomsg/nng). You can see an example of trackastra's [server](https://github.com/afermg/trackastra/blob/main/server.py) and [client](./examples/trackastra.py).

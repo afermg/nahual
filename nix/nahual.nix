@@ -12,7 +12,7 @@
 }:
 buildPythonPackage {
   pname = "nahual";
-  version = "0.0.5";
+  version = "0.0.11";
   format = "pyproject";
 
   src = ./..;

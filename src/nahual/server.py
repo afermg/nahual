@@ -9,6 +9,7 @@ from pynng import Timeout
 from pynng.nng import Socket
 
 from nahual.serial import deserialize_numpy, serialize_numpy
+from nahual.shared_memory import handle_server_request, is_shared_request
 
 
 def _is_setup_message(payload: bytes) -> bool:
@@ -68,9 +69,20 @@ async def responder(sock: Socket, setup: Callable, processor: Callable = None):
             msg = await sock.arecv_msg()
             payload = msg.bytes
 
-            if _is_setup_message(payload):
+            if is_shared_request(payload):
+                if processor is None:
+                    raise RuntimeError(
+                        "Received a shared-memory process message but no model has "
+                        "been loaded yet. Call setup with a dict first."
+                    )
+                stage = "Shared-memory data processing"
+                response = handle_server_request(payload, msg.pipe.url, processor)
+                await sock.asend(response)
+            elif payload.startswith(b"\x00"):
+                raise ValueError("unknown NUL-prefixed Nahual protocol/version")
+            elif _is_setup_message(payload):
                 stage = "Model loading"
-                processor = await setup_content(msg, sock, setup)
+                processor = await setup_content(payload, sock, setup)
             else:
                 if processor is None:
                     raise RuntimeError(
@@ -78,7 +90,7 @@ async def responder(sock: Socket, setup: Callable, processor: Callable = None):
                         "been loaded yet. Call setup with a dict first."
                     )
                 stage = "Data processing"
-                await process_content(msg, sock, processor)
+                await process_content(payload, sock, processor)
 
         except Timeout as e:
             print(f"Waiting for {stage.split(' ')[0]}: {e}")
@@ -99,9 +111,8 @@ async def responder(sock: Socket, setup: Callable, processor: Callable = None):
             await sock.asend(envelope)
 
 
-async def setup_content(msg, sock, setup: Callable) -> Callable:
-    content = msg.bytes.decode()
-    parameters = json.loads(content)
+async def setup_content(payload: bytes, sock, setup: Callable) -> Callable:
+    parameters = json.loads(payload.decode())
     # if "model" in parameters:  # Start
     print("NODE0: RECEIVED REQUEST")
     processor, info = setup(**parameters)
@@ -113,9 +124,9 @@ async def setup_content(msg, sock, setup: Callable) -> Callable:
     return processor
 
 
-async def process_content(msg, sock, processor) -> None:
+async def process_content(payload: bytes, sock, processor) -> None:
     # Receive data
-    img = deserialize_numpy(msg.bytes)
+    img = deserialize_numpy(payload)
     # Add data processing here
     result = processor(img)
     # Cover for processes that keep data in the gpu

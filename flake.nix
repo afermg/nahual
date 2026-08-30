@@ -30,7 +30,10 @@
       in
       with pkgs;
       rec {
-        packages = pkgs.callPackage ./nix { };
+        packages = import ./nix {
+          inherit (pkgs) lib python3Packages;
+          inherit pkgs;
+        };
         devShells = {
           default =
             let

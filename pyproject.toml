@@ -1,9 +1,9 @@
 [project]
 name = "nahual" 
-version = "0.0.10"
+version = "0.0.11"
 description = "Deploy and access image and data processing models across processes."
 authors = [{ name = "Alan Munoz" }]
-requires-python = ">=3.9,<=3.13"
+requires-python = ">=3.9,<3.14"
 readme = "README.md"
 dependencies = [
   "loguru>=0.7.3",
@@ -11,6 +11,9 @@ dependencies = [
   "pynng>=0.8.1",
   "requests",
 ]
+
+[project.optional-dependencies]
+appose = ["appose>=0.12.0,<0.13"]
 
 [project.urls]
 Homepage = "https://github.com/broadinstitute/monorepo/tree/main/libs/jump_babel"
@@ -26,9 +29,12 @@ dev = [
     "ruff-lsp>=0.0.62",
 ]
 test = [
+    "appose>=0.12.0,<0.13",
     "imageio>=2.37.0",
     "matplotlib>=3.9.4",
     "pytest>=8.4.0",
+    "pytest-timeout>=2.4.0",
+    "trio>=0.30.0",
 ]
 
 [tool.hatch.build.targets.sdist]

@@ -2,7 +2,7 @@
 
 import json
 from functools import partial
-from typing import Callable, Literal
+from typing import Any, Callable, Literal
 
 import numpy
 
@@ -79,10 +79,12 @@ def deserialize(packet: bytes, dtype: Literal["numpy", "dict"]) -> numpy.ndarray
 
 
 def send_receive_process(
-    data: numpy.ndarray | dict,
+    data: Any,
     expected_output_dtype: Literal["numpy", "dict"],
     address: str,
     expected_input_dtype: numpy.ndarray | dict | None = None,
+    shared_memory: bool = False,
+    timeout_ms: int | None = None,
 ):
     """Serialize, send, receive, and deserialize data.
 
@@ -102,6 +104,15 @@ def send_receive_process(
     expected_input_dtype : {numpy.ndarray, dict}, optional
         If provided, asserts that the input `data` is of this type before
         processing. Defaults to None, which skips the check.
+    shared_memory : bool, optional
+        Use the local shared-memory data plane for a NumPy process call. An
+        optional ``appose.NDArray`` input avoids staging when installed through
+        ``nahual[appose]``. Setup dictionaries and non-NumPy outputs are not
+        supported. Defaults to False.
+    timeout_ms : int or None, optional
+        Per-call NNG timeout in milliseconds. None preserves the configured
+        default. Appose-owned input requires an explicit -1 (unbounded) timeout
+        to keep the external buffer borrowed until the server completes.
 
     Returns
     -------
@@ -118,14 +129,27 @@ def send_receive_process(
     """
     # Optional input type-checking
     if expected_input_dtype is not None:
-        assert isinstance(data, expected_input_dtype), (
-            f"Input type {type(data)} does not match expected input type {expected_input_dtype}"
-        )
+        assert isinstance(
+            data, expected_input_dtype
+        ), f"Input type {type(data)} does not match expected input type {expected_input_dtype}"
+
+    if shared_memory:
+        if isinstance(data, dict):
+            raise TypeError(
+                "shared_memory=True is process-only and cannot be used for setup/dict calls"
+            )
+        if expected_output_dtype != "numpy":
+            raise TypeError("shared_memory=True requires a NumPy output signature")
+        # Lazy import keeps the default transport independent of shared-memory
+        # implementation details and the optional Appose dependency.
+        from nahual.shared_memory import client_process
+
+        return client_process(data, address, timeout_ms=timeout_ms)
 
     # encode
     packet = serialize(data)
     # Request -> receive
-    response = request_receive(packet, address=address)
+    response = request_receive(packet, address=address, timeout_ms=timeout_ms)
     # deserialize
     output = deserialize(response, dtype=expected_output_dtype)
 
