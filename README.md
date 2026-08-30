@@ -122,10 +122,11 @@ When an upstream producer can fill shared memory directly, install the optional
 Appose adapter:
 
 ```bash
-pip install 'nahual[appose]>=0.0.11'
+pip install "nahual[appose] @ git+https://github.com/afermg/nahual.git@master"
 ```
 
-Both client and model server must use Nahual 0.0.11 or newer. Nix model
+Until 0.0.11 is published on PyPI, install this feature from Git as shown
+above. Both client and model server must use Nahual 0.0.11 or newer. Nix model
 wrappers pinned to an older Nahual revision must update that pin before this
 protocol can be used.
 

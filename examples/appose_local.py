@@ -1,8 +1,13 @@
 """Use an Appose-owned input buffer with Nahual's local NNG server.
 
-Install it with ``pip install 'nahual[appose]>=0.0.11'``. Both client and
-server need Nahual 0.0.11 or newer, so update an older Nix model wrapper's
-Nahual pin first. For uniDINO, launch its normal NNG app at the address below.
+Until 0.0.11 reaches PyPI, install the optional client directly from Git:
+
+    pip install "nahual[appose] @ git+https://github.com/afermg/nahual.git@master"
+
+Both client and server need Nahual 0.0.11 or newer, so update an older Nix
+model wrapper's Nahual pin first. Then launch uniDINO's normal NNG app:
+
+    nix run github:afermg/uniDINO -- ipc:///tmp/unidino.ipc
 """
 
 import appose
