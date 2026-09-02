@@ -30,7 +30,7 @@ Thus the goal of this tool is provide a way to deploy model(s) in one (or many) 
 
 ## Available models and tools
 
-All wraps are deployed with [Nix](https://nixos.org/) and run on GPU (`cuda:0` or `GPU:0`). Launch any of them with `nix run github:afermg/<repo> -- ipc:///tmp/<name>.ipc`. With `nahual >= 0.0.9` a single server can host multiple `setup()` calls — re-call setup with a new dict to swap models without restarting.
+All wraps are deployed with [Nix](https://nixos.org/). Most neural-model wraps run on GPU (`cuda:0` or `GPU:0`); CPU-only tools are identified in their table entry. Launch any of them with `nix run github:afermg/<repo> -- ipc:///tmp/<name>.ipc`. With `nahual >= 0.0.9` a single server can host multiple `setup()` calls — re-call setup with a new dict to swap models without restarting.
 
 ### Embeddings / feature extraction
 
@@ -44,6 +44,7 @@ All wraps are deployed with [Nix](https://nixos.org/) and run on GPU (`cuda:0` o
 | [uniDINO](https://github.com/afermg/uniDINO) | `(N, 384 × C)` | Assay-independent fluorescence-microscopy ViT. Each channel is embedded independently with the shared single-channel backbone, then the cls tokens are concatenated in channel order. Official weights are separately licensed CC BY-NC-ND 4.0 (non-commercial, no derivatives), Pooch-cached on request or available through an opt-in Nix app, and excluded from the default closure. |
 | [ChannelSFormer](https://github.com/afermg/ChannelSFormer) | `(N, 384)` | Channel-agnostic ViT for cell-painting (insitro). |
 | [DeepProfiler (CPCNNv1)](https://github.com/afermg/DeepProfiler) | `(N, 2048 · ⌈C/3⌉)` | TensorFlow ResNet50V2 ImageNet morphological profiler. Same multi-pass channel handling as DINOv2/v3. |
+| [WND-CHARM (CharmFeatures)](https://github.com/afermg/nahual_charm_features) | `(N, 2895 × C)` default; `(N, 1047 × C)` short | CPU-only classical image descriptors: Haralick, Tamura, Gabor, Zernike, Chebyshev, Radon, moments, histograms, edge/object statistics, and custom transform combinations. Array-only LGPL-2.1 wrapper; accepts YX, NYX, NCYX, or singleton-Z NCZYX, processes channels independently, and concatenates them in channel order. |
 
 ### Segmentation
 
