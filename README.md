@@ -10,6 +10,24 @@ Potential solution: I figured that if we can move parameters and numpy arrays be
 
 Thus the goal of this tool is provide a way to deploy model(s) in one (or many) environments, and access them from another one, usually an orchestrator.
 
+### Preprint
+
+[Here](https://arxiv.org/abs/2608.07632) is the JUMP-lite and Nahual preprint.
+
+<details>
+<summary>Please cite using the following .bib entry</summary>
+
+```bibtex
+@article{munoz2026jumplite,
+  title={JUMP-lite: Compact, reproducible benchmarking of cell representations},
+  author={Mu{\~n}oz, Al{\'a}n F and Haslum, Johan Fredin and Shen, Runxi and Carpenter, Anne E and Singh, Shantanu},
+  journal={arXiv preprint arXiv:2608.07632},
+  year={2026}
+}
+```
+
+</details>
+
 ## Available models and tools
 
 All wraps are deployed with [Nix](https://nixos.org/) and run on GPU (`cuda:0` or `GPU:0`). Launch any of them with `nix run github:afermg/<repo> -- ipc:///tmp/<name>.ipc`. With `nahual >= 0.0.9` a single server can host multiple `setup()` calls — re-call setup with a new dict to swap models without restarting.
