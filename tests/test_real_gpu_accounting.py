@@ -1,16 +1,11 @@
 from __future__ import annotations
 
-import importlib.util
 import json
 from datetime import datetime, timezone
-from pathlib import Path
 
 import pytest
 
-SCRIPT = Path(__file__).resolve().parents[1] / "benchmarks" / "summarize_real_gpu.py"
-spec = importlib.util.spec_from_file_location("real_gpu_accounting_test", SCRIPT)
-module = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(module)
+from benchmarks import summarize_real_gpu as module
 
 
 def write_jsonl(path, values):

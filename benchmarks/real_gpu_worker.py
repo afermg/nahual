@@ -17,8 +17,8 @@ import numpy as np
 import pynng
 import torch
 import trio
-from real_gpu_contract import SLOT_MODELS as SLOTS
-from real_gpu_contract import pack_full_stack
+from benchmarks.real_gpu_contract import SLOT_MODELS as SLOTS
+from benchmarks.real_gpu_contract import pack_full_stack
 
 from nahual.server import responder
 
@@ -176,7 +176,7 @@ def main():
 
     try:
         if args.backend == "zmq":
-            from real_gpu_zmq import serve as serve_zmq
+            from benchmarks.real_gpu_zmq import serve as serve_zmq
 
             serve_zmq(
                 args.address,

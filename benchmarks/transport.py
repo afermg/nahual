@@ -18,7 +18,6 @@ import subprocess
 import sys
 import tempfile
 import time
-from pathlib import Path
 
 import numpy
 
@@ -77,7 +76,8 @@ def server(kind, output, directory):
         [
             sys.executable,
             "-u",
-            str(Path(__file__).resolve()),
+            "-m",
+            "benchmarks.transport",
             "--server",
             kind,
             "--address",

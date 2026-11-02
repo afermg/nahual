@@ -1,15 +1,9 @@
 from __future__ import annotations
 
-import importlib.util
-from pathlib import Path
-
 import numpy as np
 import pytest
 
-SCRIPT = Path(__file__).resolve().parents[1] / "benchmarks" / "real_gpu_contract.py"
-spec = importlib.util.spec_from_file_location("real_gpu_contract_test", SCRIPT)
-contract = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(contract)
+from benchmarks import real_gpu_contract as contract
 
 
 @pytest.mark.parametrize(
