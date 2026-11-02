@@ -1,5 +1,4 @@
 import struct
-from itertools import chain
 
 import numpy
 
@@ -25,17 +24,16 @@ def serialize_numpy(data: numpy.ndarray) -> bytes:
     - Bytes 2-n: The shape of every dimension, encoded as an unsigned short.
     - Remaining bytes: The contents of the numpy array.
     """
-    array_bytes = data.tobytes()
-    dtype_char = data.dtype.char.encode()
-    ndim = data.ndim.to_bytes(length=1, byteorder="big")
-    shape = data.shape
-
-    shape = bytes()
-    for x in data.shape:
-        shape = shape + struct.pack(">H", x)
-    message = dtype_char + ndim + shape + array_bytes
-
-    return message
+    header = (
+        data.dtype.char.encode()
+        + data.ndim.to_bytes(length=1, byteorder="big")
+        + struct.pack(f">{data.ndim}H", *data.shape)
+    )
+    # Joining a contiguous buffer copies directly into the final packet, instead
+    # of first allocating data.tobytes(). Strided/Fortran inputs still need a
+    # C-order staging array to preserve the legacy wire layout.
+    contiguous = numpy.ascontiguousarray(data)
+    return b"".join((header, memoryview(contiguous)))
 
 
 def deserialize_numpy(message: bytes) -> numpy.ndarray:
@@ -58,26 +56,18 @@ def deserialize_numpy(message: bytes) -> numpy.ndarray:
     - Second byte: number of dimensions (ndim)
     - Remaining bytes: shape of the array
     """
-    # First byte: dtype char
+    view = memoryview(message)
+    if len(view) < 2:
+        raise ValueError("truncated NumPy packet header")
     try:
-        first_byte = message[:1].decode()
-        in_dtype = numpy.dtype(first_byte)
-    except Exception as e:
-        print(
-            f"Error when decoding numpy dtype. Header: {message[:200].decode()}. Raises {e}"
-        )
-
-    # Second byte: ndim
-    in_ndim = int.from_bytes(message[1:2], byteorder="big")
-    # Third->n: shape
-    in_shape = tuple(
-        chain.from_iterable([
-            struct.unpack(">H", message[i * 2 + 2 : i * 2 + 4]) for i in range(in_ndim)
-        ])
-    )
-
-    reshaped_array = numpy.frombuffer(
-        message[2 * in_ndim + 2 :], dtype=in_dtype
-    ).reshape(in_shape)
-
-    return reshaped_array
+        in_dtype = numpy.dtype(bytes(view[:1]).decode("ascii"))
+    except (UnicodeDecodeError, TypeError) as error:
+        raise ValueError("invalid NumPy packet dtype") from error
+    in_ndim = view[1]
+    header_size = 2 * in_ndim + 2
+    if len(view) < header_size:
+        raise ValueError("truncated NumPy packet shape")
+    in_shape = struct.unpack_from(f">{in_ndim}H", view, 2)
+    # A bytes slice would duplicate the entire payload. NumPy retains this
+    # memoryview (and its packet owner), so the returned view remains valid.
+    return numpy.frombuffer(view[header_size:], dtype=in_dtype).reshape(in_shape)
