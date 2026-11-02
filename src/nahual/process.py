@@ -9,7 +9,7 @@ from typing import Any, Callable, Literal
 import numpy
 
 from nahual.serial import deserialize_numpy, serialize_numpy
-from nahual.transport import request_receive
+from nahual.transport import RequestSession, request_receive
 
 
 def serialize(data: numpy.ndarray | dict | list | tuple) -> bytes:
@@ -131,10 +131,18 @@ def send_receive_process(
     """
     # Optional input type-checking
     if expected_input_dtype is not None:
-        assert isinstance(
-            data, expected_input_dtype
-        ), f"Input type {type(data)} does not match expected input type {expected_input_dtype}"
+        assert isinstance(data, expected_input_dtype), (
+            f"Input type {type(data)} does not match expected input type {expected_input_dtype}"
+        )
 
+    return _exchange(
+        data, expected_output_dtype, address, shared_memory, timeout_ms, request_receive
+    )
+
+
+def _exchange(
+    data, expected_output_dtype, address, shared_memory, timeout_ms, requester
+):
     if shared_memory:
         if isinstance(data, dict):
             raise TypeError(
@@ -146,16 +154,76 @@ def send_receive_process(
         # implementation details and the optional Appose dependency.
         from nahual.shared_memory import client_process
 
-        return client_process(data, address, timeout_ms=timeout_ms)
+        return client_process(data, address, timeout_ms=timeout_ms, requester=requester)
 
     # encode
     packet = serialize(data)
     # Request -> receive
-    response = request_receive(packet, address=address, timeout_ms=timeout_ms)
+    response = requester(packet, address=address, timeout_ms=timeout_ms)
     # deserialize
     output = deserialize(response, dtype=expected_output_dtype)
 
     return output
+
+
+class Client:
+    """Context-managed setup/process client with a persistent NNG connection.
+
+    The existing dispatch helpers remain stateless. Use one Client per worker
+    and close it explicitly or with ``with``. Calls are synchronous; overlapping
+    calls and use after fork are rejected. ``timeout_ms`` on a call overrides
+    the client default. A timeout does not cancel server-side processing.
+    """
+
+    def __init__(
+        self,
+        address: str,
+        *,
+        signature: tuple[str, str] = ("dict", "numpy"),
+        timeout_ms: int | None = None,
+    ):
+        if len(signature) != 2 or any(
+            kind not in ("dict", "numpy") for kind in signature
+        ):
+            raise ValueError("signature must contain two 'dict' or 'numpy' entries")
+        self._signature = tuple(signature)
+        self._session = RequestSession(address, timeout_ms=timeout_ms)
+
+    def setup(self, parameters: dict, *, timeout_ms: int | None = None):
+        if not isinstance(parameters, dict):
+            raise TypeError("setup requires a parameter dictionary")
+        return self._call(parameters, self._signature[0], False, timeout_ms)
+
+    def process(
+        self, data, *, shared_memory: bool = False, timeout_ms: int | None = None
+    ):
+        if isinstance(data, dict):
+            raise TypeError("process does not accept setup dictionaries; use setup()")
+        return self._call(data, self._signature[1], shared_memory, timeout_ms)
+
+    def _call(self, data, output_dtype, shared_memory, timeout_ms):
+        self._session._check_available()
+        effective_timeout = (
+            self._session.timeout_ms if timeout_ms is None else timeout_ms
+        )
+        return _exchange(
+            data,
+            output_dtype,
+            self._session.address,
+            shared_memory,
+            effective_timeout,
+            self._session.request,
+        )
+
+    def close(self):
+        self._session.close()
+
+    def __enter__(self):
+        self._session.__enter__()
+        return self
+
+    def __exit__(self, *_exc):
+        self.close()
 
 
 def get_output_signature(name: str) -> tuple[str, str]:

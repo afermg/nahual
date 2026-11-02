@@ -122,6 +122,35 @@ data = numpy.random.random_sample((1, 3, 420, 420))
 result = process(data + 1000, address=address)
 ```
 
+### Persistent clients for repeated calls
+
+The existing `dispatch_setup_process` helpers open a connection per call. For
+small requests or repeated batches, explicitly reuse one connection:
+
+```python
+from nahual.process import Client
+
+with Client("ipc:///tmp/dinov2.ipc", timeout_ms=300_000) as client:
+    info = client.setup({
+        "repo_or_dir": "facebookresearch/dinov2",
+        "model": "dinov2_vits14_lc",
+    })
+    result = client.process(data)
+    local_result = client.process(data, shared_memory=True)
+```
+
+`Client` uses the same server and wire formats; no wrapper changes are needed.
+For nonstandard outputs pass `signature=("dict", "dict")`, for example. Each
+call can override `timeout_ms`; `None` inherits the client default. Appose
+inputs require an effective `timeout_ms=-1` as described below.
+
+Use one client per worker and a context manager (or explicit `close()`).
+Overlapping request/close operations and use after fork are rejected. A failed
+transport exchange discards the connection; the next call creates a new one.
+Requests are not automatically retried, and a timeout **does not cancel** work
+already running on the server. Server-reported errors leave the completed
+connection available for the next call. The default stateless API is unchanged.
+
 ### Optional local shared-memory data plane
 
 For a client and server on the same Linux host, NumPy process calls can opt into
