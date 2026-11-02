@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import os
+import threading
 from functools import partial
 from typing import Any, Callable, Literal
 
@@ -141,7 +143,13 @@ def send_receive_process(
 
 
 def _exchange(
-    data, expected_output_dtype, address, shared_memory, timeout_ms, requester
+    data,
+    expected_output_dtype,
+    address,
+    shared_memory,
+    timeout_ms,
+    requester,
+    pool=None,
 ):
     if shared_memory:
         if isinstance(data, dict):
@@ -154,7 +162,9 @@ def _exchange(
         # implementation details and the optional Appose dependency.
         from nahual.shared_memory import client_process
 
-        return client_process(data, address, timeout_ms=timeout_ms, requester=requester)
+        return client_process(
+            data, address, timeout_ms=timeout_ms, requester=requester, pool=pool
+        )
 
     # encode
     packet = serialize(data)
@@ -173,6 +183,10 @@ class Client:
     and close it explicitly or with ``with``. Calls are synchronous; overlapping
     calls and use after fork are rejected. ``timeout_ms`` on a call overrides
     the client default. A timeout does not cancel server-side processing.
+    Successful NumPy shared-memory calls cache exact-size staging segments,
+    bounded by ``shared_memory_cache_bytes`` (default 64 MiB) and eight idle
+    segments. Set the budget to zero to disable caching. Close the client to
+    unlink cached storage. Shared-memory outputs remain independent owning arrays.
     """
 
     def __init__(
@@ -181,13 +195,23 @@ class Client:
         *,
         signature: tuple[str, str] = ("dict", "numpy"),
         timeout_ms: int | None = None,
+        shared_memory_cache_bytes: int = 64 * 1024 * 1024,
     ):
+        if (
+            isinstance(shared_memory_cache_bytes, bool)
+            or not isinstance(shared_memory_cache_bytes, int)
+            or shared_memory_cache_bytes < 0
+        ):
+            raise ValueError("shared_memory_cache_bytes must be a non-negative integer")
         if len(signature) != 2 or any(
             kind not in ("dict", "numpy") for kind in signature
         ):
             raise ValueError("signature must contain two 'dict' or 'numpy' entries")
         self._signature = tuple(signature)
         self._session = RequestSession(address, timeout_ms=timeout_ms)
+        self._cache_bytes = shared_memory_cache_bytes
+        self._pool = None
+        self._lock = threading.Lock()
 
     def setup(self, parameters: dict, *, timeout_ms: int | None = None):
         if not isinstance(parameters, dict):
@@ -203,20 +227,42 @@ class Client:
 
     def _call(self, data, output_dtype, shared_memory, timeout_ms):
         self._session._check_available()
-        effective_timeout = (
-            self._session.timeout_ms if timeout_ms is None else timeout_ms
-        )
-        return _exchange(
-            data,
-            output_dtype,
-            self._session.address,
-            shared_memory,
-            effective_timeout,
-            self._session.request,
-        )
+        if not self._lock.acquire(blocking=False):
+            raise RuntimeError("Client already has an operation in progress")
+        try:
+            self._session._check_available()
+            effective_timeout = (
+                self._session.timeout_ms if timeout_ms is None else timeout_ms
+            )
+            if shared_memory and self._cache_bytes and isinstance(data, numpy.ndarray):
+                if self._pool is None:
+                    from nahual.shared_memory import _SharedMemoryPool
+
+                    self._pool = _SharedMemoryPool(self._cache_bytes)
+            return _exchange(
+                data,
+                output_dtype,
+                self._session.address,
+                shared_memory,
+                effective_timeout,
+                self._session.request,
+                pool=self._pool,
+            )
+        finally:
+            self._lock.release()
 
     def close(self):
-        self._session.close()
+        # Check PID before touching a lock or shared memory inherited by fork.
+        if os.getpid() != self._session._pid:
+            raise RuntimeError("cannot close an inherited Client after fork")
+        if not self._lock.acquire(blocking=False):
+            raise RuntimeError("Client already has an operation in progress")
+        try:
+            self._session.close()
+            if self._pool is not None:
+                self._pool.close()
+        finally:
+            self._lock.release()
 
     def __enter__(self):
         self._session.__enter__()

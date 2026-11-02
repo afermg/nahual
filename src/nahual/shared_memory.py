@@ -16,6 +16,7 @@ import mmap
 import os
 import re
 import secrets
+from collections import OrderedDict
 from typing import Any, Callable
 
 import numpy
@@ -388,6 +389,61 @@ def _cleanup_client_segment(segment: Any) -> None:
         raise error
 
 
+class _SharedMemoryPool:
+    """Bounded exact-size LRU cache, owned by a synchronous Client.
+
+    Only successfully completed calls may return a segment to this cache.
+    Never reuse storage after a timeout, interruption, or protocol error: the
+    server might still have it mapped. No server-side protocol changes needed.
+    """
+
+    def __init__(self, max_bytes: int):
+        self.max_bytes = max_bytes
+        self._idle: OrderedDict[int, Any] = OrderedDict()
+        self._cached_bytes = 0
+
+    def acquire(self, capacity: int):
+        size = max(1, capacity)
+        segment = self._idle.pop(size, None)
+        if segment is not None:
+            self._cached_bytes -= size
+            return segment
+        return _create_segment(size)
+
+    def release(self, segment):
+        size = segment.size
+        if size > self.max_bytes:
+            _cleanup_client_segment(segment)
+            return
+        # Keep one idle segment per size and cap the count so tiny arrays
+        # cannot exhaust file descriptors. Client serializes the whole call.
+        previous = self._idle.pop(size, None)
+        if previous is not None:
+            self._cached_bytes -= size
+            _cleanup_client_segment(previous)
+        while self._idle and (
+            self._cached_bytes + size > self.max_bytes or len(self._idle) >= 8
+        ):
+            old_size, old = self._idle.popitem(last=False)
+            self._cached_bytes -= old_size
+            _cleanup_client_segment(old)
+        self._idle[size] = segment
+        self._cached_bytes += size
+
+    def close(self):
+        error = None
+        while self._idle:
+            size, segment = self._idle.popitem(last=False)
+            self._cached_bytes -= size
+            try:
+                _cleanup_client_segment(segment)
+            except BaseException as caught:
+                if error is None:
+                    error = caught
+        if error is not None:
+            raise error
+
+
 def _send_shared_request(
     array: numpy.ndarray,
     segment: Any,
@@ -423,20 +479,28 @@ def _client_numpy(
     address: str,
     timeout_ms: int | None,
     requester: Callable | None = None,
+    pool: _SharedMemoryPool | None = None,
 ) -> numpy.ndarray:
     _dtype_string(array.dtype)
     capacity = array.nbytes
-    segment = _create_segment(max(1, capacity))
+    segment = (
+        pool.acquire(capacity)
+        if pool is not None
+        else _create_segment(max(1, capacity))
+    )
     primary_error: BaseException | None = None
+    completed = False
     staged = None
     try:
         staged = numpy.ndarray(
             array.shape, dtype=array.dtype, buffer=segment.buf, order="C"
         )
         numpy.copyto(staged, array)
-        return _send_shared_request(
+        output = _send_shared_request(
             array, segment, address, "reuse", timeout_ms, requester
         )
+        completed = True
+        return output
     except BaseException as error:
         primary_error = error
         raise
@@ -444,7 +508,14 @@ def _client_numpy(
         if staged is not None:
             del staged
         try:
-            _cleanup_client_segment(segment)
+            if pool is not None and completed:
+                try:
+                    pool.release(segment)
+                except BaseException:
+                    _cleanup_client_segment(segment)
+                    raise
+            else:
+                _cleanup_client_segment(segment)
         except BaseException:
             if primary_error is None:
                 raise
@@ -508,11 +579,12 @@ def client_process(
     address: str,
     timeout_ms: int | None = None,
     requester: Callable | None = None,
+    pool: _SharedMemoryPool | None = None,
 ) -> numpy.ndarray:
     """Execute one local process call through the shared-memory data plane."""
     require_ipc_address(address)
     if isinstance(value, numpy.ndarray):
-        return _client_numpy(value, address, timeout_ms, requester)
+        return _client_numpy(value, address, timeout_ms, requester, pool)
     if isinstance(value, (dict, list, tuple)):
         raise TypeError(
             "shared_memory=True requires a NumPy ndarray or appose.NDArray input"
