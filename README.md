@@ -165,7 +165,9 @@ protocol work unchanged.
 For repeatable transport measurements, see [`benchmarks/README.md`](benchmarks/README.md).
 The harness includes an optional PyZMQ multipart prototype for comparison; it
 is not a supported Nahual backend. No model inference or GPU transfers are
-included in those measurements.
+included in those measurements. See the separate [real JUMP-lite GPU validation](benchmarks/REAL_GPU.md)
+for five-model inference on local raw TIFF and MQ JPEG-XL inputs, GPU utilization,
+numerical checks and scheduling experiments.
 
 ### Optional local shared-memory data plane
 

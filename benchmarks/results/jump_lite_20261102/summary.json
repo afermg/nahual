@@ -1,0 +1,1400 @@
+{
+  "date": "2026-11-02",
+  "host": "oppy",
+  "baseline_commit": "56aa3fe1c36fe891a933a76d05db6fca2c3673f1",
+  "optimized_commit": "7609bffbec9999b4e6594e4948e371e279ef2c0a",
+  "source": "/work/scratch/amunoz/nahual-real-gpu-20261102",
+  "hardware": "index, uuid, name, driver_version, memory.total [MiB]\n0, GPU-74ddf3af-f3d2-4ad0-9964-9bb6c60e6935, NVIDIA H100 NVL, 580.159.03, 95830 MiB\n1, GPU-609274ea-2230-c267-2a39-55138e37ed9d, NVIDIA H100 NVL, 580.159.03, 95830 MiB\n2, GPU-1f0a3008-4e65-fe0b-e548-894345650203, NVIDIA H100 NVL, 580.159.03, 95830 MiB\n3, GPU-928c0262-ac88-1611-5272-968e0511df8f, NVIDIA H100 NVL, 580.159.03, 95830 MiB\n",
+  "software": {
+    "numpy": "1.26.4",
+    "torch": "2.10.0",
+    "torchvision": "0.25.0",
+    "transformers": "4.46.1",
+    "pynng": "0.8.1",
+    "trio": "0.34.0",
+    "tifffile": "2026.1.28"
+  },
+  "pyzmq_trial": {
+    "pyzmq": "27.1.0",
+    "libzmq": "4.3.5",
+    "production_backend_changed": false
+  },
+  "loaded_model_state_sha256": {
+    "dino_pair": {
+      "dinov2": "85875a148ff473541ae8e71ad44f9cc0a004c2ca042614d8c2448f16135c34ec",
+      "dinov2_random": "9716c4927478f8fe218babffbfbbee52d3cd6df4ffb2cce1ac0032a715d8f807"
+    },
+    "morphem": {
+      "morphem": "403a9bc764fc3eee8cb8a1d075515980bdd45cc5aae91921cb4b87af983b9ff3"
+    },
+    "openphenom": {
+      "openphenom": "288cc8ccf83059e0550738cdbdf038a438b3bf3a9fa56889d5cd76f0c5fe81ec"
+    },
+    "subcell": {
+      "subcell_clip01": "bf2ad6f87768703482c6711ca580861eac13fd7ec763135856fe7611d0f18165"
+    }
+  },
+  "recipe_inventory_files_verified": 87,
+  "clock": {
+    "hostname": "oppy",
+    "observed_local_time": "2026-11-02T14:41:55-05:00",
+    "local_timezone_names": [
+      "EST",
+      "EDT"
+    ],
+    "gpu_timestamp_utc_offset_seconds": -18000,
+    "source": "time.localtime().tm_gmtoff on the benchmark host; nvidia-smi CSV timestamps are local wall time",
+    "scope": "All runs in this evidence directory occurred on 2026-11-02 after the DST transition. No offset transition occurs within these runs."
+  },
+  "completed_configurations": 14,
+  "rejected_configurations": 2,
+  "measured_repeats": 110,
+  "measured_model_site_outputs": 35200,
+  "successful_canary_checks": 624,
+  "all_successful_canaries_exact": true,
+  "all_source_inputs_and_caches_rehashed_after": true,
+  "gpus_clean_after": true,
+  "production_mutated": false,
+  "manuscript_updated": false,
+  "runs": [
+    {
+      "name": "baseline-before",
+      "status": "complete",
+      "summary": [
+        {
+          "run": "baseline-before",
+          "label": "baseline-56aa3fe-before",
+          "mode": "wire_once",
+          "replicas": 1,
+          "schedule": "model_parallel",
+          "decode": "preloaded",
+          "batch_size": 1,
+          "batch_inference": false,
+          "sites_per_repeat": 64,
+          "repeats": 5,
+          "median_seconds": 8.682613870012574,
+          "first_repeat_seconds": 8.971239555976354,
+          "median_seconds_excluding_first": 8.6428026414942,
+          "median_sites_per_second_excluding_first": 7.405162495067708,
+          "median_sites_per_second_all_five_models": 7.371052192132934,
+          "median_sites_per_hour_all_five_models": 26535.787891678563,
+          "minimum_seconds": 8.557344923960045,
+          "maximum_seconds": 8.971239555976354,
+          "median_request_ms": 113.22011152515188,
+          "median_nonprocessor_request_ms_mean": 79.87051536156287,
+          "gpu_mean_utilization_percent": {
+            "0": 13.329095607235143,
+            "1": 26.036485788113694,
+            "2": 41.08165374677002,
+            "3": 19.497364341085273
+          },
+          "gpu_peak_memory_mib": {
+            "0": 1043.0,
+            "1": 1119.0,
+            "2": 2471.0,
+            "3": 2727.0
+          },
+          "peak_pytorch_allocated_gib": 1.8750190734863281,
+          "validation_cases": 24,
+          "validation_passed": true,
+          "validation_exact": true
+        },
+        {
+          "run": "baseline-before",
+          "label": "baseline-56aa3fe-before",
+          "mode": "shm_once",
+          "replicas": 1,
+          "schedule": "model_parallel",
+          "decode": "preloaded",
+          "batch_size": 1,
+          "batch_inference": false,
+          "sites_per_repeat": 64,
+          "repeats": 5,
+          "median_seconds": 5.396822049980983,
+          "first_repeat_seconds": 5.396822049980983,
+          "median_seconds_excluding_first": 5.426095265022013,
+          "median_sites_per_second_excluding_first": 11.796810259265182,
+          "median_sites_per_second_all_five_models": 11.858830883672645,
+          "median_sites_per_hour_all_five_models": 42691.791181221524,
+          "minimum_seconds": 5.319374194019474,
+          "maximum_seconds": 5.598460912005976,
+          "median_request_ms": 54.10962091991678,
+          "median_nonprocessor_request_ms_mean": 20.088280899017263,
+          "gpu_mean_utilization_percent": {
+            "0": 21.17924297924298,
+            "1": 41.776373626373626,
+            "2": 65.51440781440782,
+            "3": 31.136691086691087
+          },
+          "gpu_peak_memory_mib": {
+            "0": 1043.0,
+            "1": 1119.0,
+            "2": 2471.0,
+            "3": 2727.0
+          },
+          "peak_pytorch_allocated_gib": 1.8750190734863281,
+          "validation_cases": 24,
+          "validation_passed": true,
+          "validation_exact": true
+        }
+      ],
+      "report_sha256": "7d16a407e95da1ee9ce780412d5c337ac0e22dcda061ea31e261c2adf7823304",
+      "code": {
+        "nahual_root": "/work/scratch/amunoz/nahual-real-gpu-20261102/baseline/src/nahual",
+        "nahual_files": {
+          "preprocess.py": "5899841a1e33e26c46c8f6446c656a2aac861c2451a328e5c200b86680a668af",
+          "process.py": "13417566be079e374142b9c5f24af99d69d3f39cbbdb33e03dac0572862dae6a",
+          "serial.py": "981a9ed94f143c41838c03b6aeaa615420c16ec72865cff80014a671107717f8",
+          "server.py": "4a8925b7abdbe2c3e9bf03cf7569ac94920773f0b76090ea17d5580f99558a7a",
+          "shared_memory.py": "95733abac5552184e673b01e219a01f058d9bae33ffb30cb2dc283dcee70e4c3",
+          "transport.py": "02f874ee3a7eddab4187150b5df9a12d4ede143858fb74d623450e16ab8c5faa",
+          "utils.py": "4dbdef4d213963052408de22d9aa51dde3db5ca6640b26d9a9c35111a053b50d"
+        },
+        "harness_files": {
+          "run_real_gpu.py": "3996114908c0c4d64eead1658987eca8eb81e1ca9f2a18e249676685083be378",
+          "real_gpu_worker.py": "757957c81d166eadef7b54fadaadf71703cba219ecd68422169c2d2ff5e3e628"
+        },
+        "manifest_sha256": "6562f4ed1e55339308b4f94e94fdf053686f32f44da3498d6fee05c51f3e7936"
+      },
+      "as_run_snapshots": [
+        "primary-harness"
+      ],
+      "parallel_model_startup_seconds": 7.013204248039983
+    },
+    {
+      "name": "master-primary",
+      "status": "complete",
+      "summary": [
+        {
+          "run": "master-primary",
+          "label": "master-7609bff",
+          "mode": "wire_once",
+          "replicas": 1,
+          "schedule": "model_parallel",
+          "decode": "preloaded",
+          "batch_size": 1,
+          "batch_inference": false,
+          "sites_per_repeat": 64,
+          "repeats": 5,
+          "median_seconds": 4.822670530993491,
+          "first_repeat_seconds": 4.935639486997388,
+          "median_seconds_excluding_first": 4.813890288525727,
+          "median_sites_per_second_excluding_first": 13.294904760395397,
+          "median_sites_per_second_all_five_models": 13.270655664469727,
+          "median_sites_per_hour_all_five_models": 47774.36039209102,
+          "minimum_seconds": 4.754260832094587,
+          "maximum_seconds": 4.935639486997388,
+          "median_request_ms": 47.18566051451489,
+          "median_nonprocessor_request_ms_mean": 13.086338150515076,
+          "gpu_mean_utilization_percent": {
+            "0": 24.308391304347825,
+            "1": 46.971710144927535,
+            "2": 74.07423188405797,
+            "3": 34.65407246376812
+          },
+          "gpu_peak_memory_mib": {
+            "0": 1043.0,
+            "1": 1119.0,
+            "2": 2471.0,
+            "3": 2727.0
+          },
+          "peak_pytorch_allocated_gib": 1.8750190734863281,
+          "validation_cases": 24,
+          "validation_passed": true,
+          "validation_exact": true
+        },
+        {
+          "run": "master-primary",
+          "label": "master-7609bff",
+          "mode": "shm_once",
+          "replicas": 1,
+          "schedule": "model_parallel",
+          "decode": "preloaded",
+          "batch_size": 1,
+          "batch_inference": false,
+          "sites_per_repeat": 64,
+          "repeats": 5,
+          "median_seconds": 5.404507947037928,
+          "first_repeat_seconds": 5.518167043104768,
+          "median_seconds_excluding_first": 5.382862478552852,
+          "median_sites_per_second_excluding_first": 11.889777074097353,
+          "median_sites_per_second_all_five_models": 11.841966119242503,
+          "median_sites_per_hour_all_five_models": 42631.07802927301,
+          "minimum_seconds": 5.315064019989222,
+          "maximum_seconds": 5.518167043104768,
+          "median_request_ms": 54.80080150300637,
+          "median_nonprocessor_request_ms_mean": 20.241628335497808,
+          "gpu_mean_utilization_percent": {
+            "0": 21.49122914122914,
+            "1": 40.96874236874237,
+            "2": 67.33994708994709,
+            "3": 31.211843711843713
+          },
+          "gpu_peak_memory_mib": {
+            "0": 1043.0,
+            "1": 1119.0,
+            "2": 2471.0,
+            "3": 2727.0
+          },
+          "peak_pytorch_allocated_gib": 1.8750190734863281,
+          "validation_cases": 24,
+          "validation_passed": true,
+          "validation_exact": true
+        },
+        {
+          "run": "master-primary",
+          "label": "master-7609bff",
+          "mode": "wire_session",
+          "replicas": 1,
+          "schedule": "model_parallel",
+          "decode": "preloaded",
+          "batch_size": 1,
+          "batch_inference": false,
+          "sites_per_repeat": 64,
+          "repeats": 5,
+          "median_seconds": 4.8582685409346595,
+          "first_repeat_seconds": 4.9161916099255905,
+          "median_seconds_excluding_first": 4.853226531471591,
+          "median_sites_per_second_excluding_first": 13.187117613590198,
+          "median_sites_per_second_all_five_models": 13.173417537699004,
+          "median_sites_per_hour_all_five_models": 47424.303135716415,
+          "minimum_seconds": 4.8356193009531125,
+          "maximum_seconds": 4.9161916099255905,
+          "median_request_ms": 45.996433997061104,
+          "median_nonprocessor_request_ms_mean": 12.156612615399354,
+          "gpu_mean_utilization_percent": {
+            "0": 23.389666666666667,
+            "1": 46.202333333333335,
+            "2": 74.574,
+            "3": 34.821666666666665
+          },
+          "gpu_peak_memory_mib": {
+            "0": 1043.0,
+            "1": 1119.0,
+            "2": 2471.0,
+            "3": 2727.0
+          },
+          "peak_pytorch_allocated_gib": 1.8750190734863281,
+          "validation_cases": 24,
+          "validation_passed": true,
+          "validation_exact": true
+        },
+        {
+          "run": "master-primary",
+          "label": "master-7609bff",
+          "mode": "shm_session_uncached",
+          "replicas": 1,
+          "schedule": "model_parallel",
+          "decode": "preloaded",
+          "batch_size": 1,
+          "batch_inference": false,
+          "sites_per_repeat": 64,
+          "repeats": 5,
+          "median_seconds": 5.349970750045031,
+          "first_repeat_seconds": 5.163425841019489,
+          "median_seconds_excluding_first": 5.433896276517771,
+          "median_sites_per_second_excluding_first": 11.780731006679876,
+          "median_sites_per_second_all_five_models": 11.962682225778767,
+          "median_sites_per_hour_all_five_models": 43065.65601280356,
+          "minimum_seconds": 5.089397347997874,
+          "maximum_seconds": 5.529911234043539,
+          "median_request_ms": 53.27976052649319,
+          "median_nonprocessor_request_ms_mean": 18.48106898842161,
+          "gpu_mean_utilization_percent": {
+            "0": 21.839238095238095,
+            "1": 42.757026455026455,
+            "2": 68.78380952380952,
+            "3": 31.91642328042328
+          },
+          "gpu_peak_memory_mib": {
+            "0": 1043.0,
+            "1": 1119.0,
+            "2": 2471.0,
+            "3": 2727.0
+          },
+          "peak_pytorch_allocated_gib": 1.8750190734863281,
+          "validation_cases": 24,
+          "validation_passed": true,
+          "validation_exact": true
+        },
+        {
+          "run": "master-primary",
+          "label": "master-7609bff",
+          "mode": "shm_session_cached",
+          "replicas": 1,
+          "schedule": "model_parallel",
+          "decode": "preloaded",
+          "batch_size": 1,
+          "batch_inference": false,
+          "sites_per_repeat": 64,
+          "repeats": 5,
+          "median_seconds": 4.4359846209408715,
+          "first_repeat_seconds": 4.4359846209408715,
+          "median_seconds_excluding_first": 4.437721962516662,
+          "median_sites_per_second_excluding_first": 14.421933043388798,
+          "median_sites_per_second_all_five_models": 14.427462101170589,
+          "median_sites_per_hour_all_five_models": 51938.863564214116,
+          "minimum_seconds": 4.415742864017375,
+          "maximum_seconds": 4.455801346921362,
+          "median_request_ms": 38.12691807979718,
+          "median_nonprocessor_request_ms_mean": 3.5020623736272682,
+          "gpu_mean_utilization_percent": {
+            "0": 26.436363636363637,
+            "1": 50.22727272727273,
+            "2": 82.16363636363636,
+            "3": 39.71818181818182
+          },
+          "gpu_peak_memory_mib": {
+            "0": 1043.0,
+            "1": 1119.0,
+            "2": 2471.0,
+            "3": 2727.0
+          },
+          "peak_pytorch_allocated_gib": 1.8750190734863281,
+          "validation_cases": 24,
+          "validation_passed": true,
+          "validation_exact": true
+        }
+      ],
+      "report_sha256": "f9fd3a2b16b2184e8f5224840b77703810d8a0f338f4dbaf0cfc9d7f6936c34a",
+      "code": {
+        "nahual_root": "/work/users/amunoz/worktrees/nahual-real-gpu-bench/src/nahual",
+        "nahual_files": {
+          "preprocess.py": "5899841a1e33e26c46c8f6446c656a2aac861c2451a328e5c200b86680a668af",
+          "process.py": "8c78c1ada3a8e7f6c3b10aafcb5d9d36ee9ed3098395608b00d2bfe2d1f10a04",
+          "serial.py": "632628171e5bfb7f728d8661542c4a24a0cd28379f4c26c064588acd02063b53",
+          "server.py": "4a8925b7abdbe2c3e9bf03cf7569ac94920773f0b76090ea17d5580f99558a7a",
+          "shared_memory.py": "990cec1f9499a062d2c0d3dcdf09bc81bb1bd1b3894bcffd254b2c757a9142ce",
+          "transport.py": "7746e452b9dfb256ee274fab8ebe6962f8955168db87517f94dd7da57b131064",
+          "utils.py": "4dbdef4d213963052408de22d9aa51dde3db5ca6640b26d9a9c35111a053b50d"
+        },
+        "harness_files": {
+          "run_real_gpu.py": "3996114908c0c4d64eead1658987eca8eb81e1ca9f2a18e249676685083be378",
+          "real_gpu_worker.py": "757957c81d166eadef7b54fadaadf71703cba219ecd68422169c2d2ff5e3e628"
+        },
+        "manifest_sha256": "6562f4ed1e55339308b4f94e94fdf053686f32f44da3498d6fee05c51f3e7936"
+      },
+      "as_run_snapshots": [
+        "primary-harness"
+      ],
+      "parallel_model_startup_seconds": 7.012415837030858
+    },
+    {
+      "name": "baseline-after",
+      "status": "complete",
+      "summary": [
+        {
+          "run": "baseline-after",
+          "label": "baseline-56aa3fe-after",
+          "mode": "wire_once",
+          "replicas": 1,
+          "schedule": "model_parallel",
+          "decode": "preloaded",
+          "batch_size": 1,
+          "batch_inference": false,
+          "sites_per_repeat": 64,
+          "repeats": 5,
+          "median_seconds": 8.757935835048556,
+          "first_repeat_seconds": 8.926126768928953,
+          "median_seconds_excluding_first": 8.667197917529847,
+          "median_sites_per_second_excluding_first": 7.384972159806747,
+          "median_sites_per_second_all_five_models": 7.307658015017322,
+          "median_sites_per_hour_all_five_models": 26307.568854062356,
+          "minimum_seconds": 8.558093484025449,
+          "maximum_seconds": 8.926126768928953,
+          "median_request_ms": 115.17324356827885,
+          "median_nonprocessor_request_ms_mean": 80.51394720496319,
+          "gpu_mean_utilization_percent": {
+            "0": 13.296481425551193,
+            "1": 25.16162287325078,
+            "2": 40.74207188160677,
+            "3": 19.85559750327192
+          },
+          "gpu_peak_memory_mib": {
+            "0": 1043.0,
+            "1": 1119.0,
+            "2": 2471.0,
+            "3": 2727.0
+          },
+          "peak_pytorch_allocated_gib": 1.8750190734863281,
+          "validation_cases": 24,
+          "validation_passed": true,
+          "validation_exact": true
+        },
+        {
+          "run": "baseline-after",
+          "label": "baseline-56aa3fe-after",
+          "mode": "shm_once",
+          "replicas": 1,
+          "schedule": "model_parallel",
+          "decode": "preloaded",
+          "batch_size": 1,
+          "batch_inference": false,
+          "sites_per_repeat": 64,
+          "repeats": 5,
+          "median_seconds": 5.545332875917666,
+          "first_repeat_seconds": 5.525721929036081,
+          "median_seconds_excluding_first": 5.599423872481566,
+          "median_sites_per_second_excluding_first": 11.430814015425014,
+          "median_sites_per_second_all_five_models": 11.541236826005509,
+          "median_sites_per_hour_all_five_models": 41548.452573619834,
+          "minimum_seconds": 5.510419987025671,
+          "maximum_seconds": 5.677849779021926,
+          "median_request_ms": 57.11828905623406,
+          "median_nonprocessor_request_ms_mean": 21.75446542469217,
+          "gpu_mean_utilization_percent": {
+            "0": 20.553174603174604,
+            "1": 39.82962962962963,
+            "2": 64.24126984126984,
+            "3": 30.263756613756613
+          },
+          "gpu_peak_memory_mib": {
+            "0": 1043.0,
+            "1": 1119.0,
+            "2": 2471.0,
+            "3": 2727.0
+          },
+          "peak_pytorch_allocated_gib": 1.8750190734863281,
+          "validation_cases": 24,
+          "validation_passed": true,
+          "validation_exact": true
+        }
+      ],
+      "report_sha256": "b3caf2161c802745b24409aeaa233f58cefe0838981ef9b86b91ebaa994de68a",
+      "code": {
+        "nahual_root": "/work/scratch/amunoz/nahual-real-gpu-20261102/baseline/src/nahual",
+        "nahual_files": {
+          "preprocess.py": "5899841a1e33e26c46c8f6446c656a2aac861c2451a328e5c200b86680a668af",
+          "process.py": "13417566be079e374142b9c5f24af99d69d3f39cbbdb33e03dac0572862dae6a",
+          "serial.py": "981a9ed94f143c41838c03b6aeaa615420c16ec72865cff80014a671107717f8",
+          "server.py": "4a8925b7abdbe2c3e9bf03cf7569ac94920773f0b76090ea17d5580f99558a7a",
+          "shared_memory.py": "95733abac5552184e673b01e219a01f058d9bae33ffb30cb2dc283dcee70e4c3",
+          "transport.py": "02f874ee3a7eddab4187150b5df9a12d4ede143858fb74d623450e16ab8c5faa",
+          "utils.py": "4dbdef4d213963052408de22d9aa51dde3db5ca6640b26d9a9c35111a053b50d"
+        },
+        "harness_files": {
+          "run_real_gpu.py": "3996114908c0c4d64eead1658987eca8eb81e1ca9f2a18e249676685083be378",
+          "real_gpu_worker.py": "757957c81d166eadef7b54fadaadf71703cba219ecd68422169c2d2ff5e3e628"
+        },
+        "manifest_sha256": "6562f4ed1e55339308b4f94e94fdf053686f32f44da3498d6fee05c51f3e7936"
+      },
+      "as_run_snapshots": [
+        "primary-harness"
+      ],
+      "parallel_model_startup_seconds": 6.763558964012191
+    },
+    {
+      "name": "replicas2",
+      "status": "complete",
+      "summary": [
+        {
+          "run": "replicas2",
+          "label": "master-7609bff-replicas2",
+          "mode": "shm_session_cached",
+          "replicas": 2,
+          "schedule": "model_parallel",
+          "decode": "preloaded",
+          "batch_size": 1,
+          "batch_inference": false,
+          "sites_per_repeat": 64,
+          "repeats": 5,
+          "median_seconds": 4.172744025941938,
+          "first_repeat_seconds": 4.128752799006179,
+          "median_seconds_excluding_first": 4.179189036425669,
+          "median_sites_per_second_excluding_first": 15.314012276674543,
+          "median_sites_per_second_all_five_models": 15.337629052276434,
+          "median_sites_per_hour_all_five_models": 55215.46458819516,
+          "minimum_seconds": 4.128752799006179,
+          "maximum_seconds": 4.204053892986849,
+          "median_request_ms": 67.34265247359872,
+          "median_nonprocessor_request_ms_mean": 3.48371158588634,
+          "gpu_mean_utilization_percent": {
+            "0": 30.905238095238094,
+            "1": 59.282380952380954,
+            "2": 97.0495238095238,
+            "3": 45.83428571428571
+          },
+          "gpu_peak_memory_mib": {
+            "0": 2083.0,
+            "1": 2235.0,
+            "2": 4939.0,
+            "3": 5451.0
+          },
+          "peak_pytorch_allocated_gib": 1.8750190734863281,
+          "validation_cases": 48,
+          "validation_passed": true,
+          "validation_exact": true
+        }
+      ],
+      "report_sha256": "91b0ca2dcbbc74a5bf186f956b1b7197e1fab6453c902222891105b383d4ad79",
+      "code": {
+        "nahual_root": "/work/users/amunoz/worktrees/nahual-real-gpu-bench/src/nahual",
+        "nahual_files": {
+          "preprocess.py": "5899841a1e33e26c46c8f6446c656a2aac861c2451a328e5c200b86680a668af",
+          "process.py": "8c78c1ada3a8e7f6c3b10aafcb5d9d36ee9ed3098395608b00d2bfe2d1f10a04",
+          "serial.py": "632628171e5bfb7f728d8661542c4a24a0cd28379f4c26c064588acd02063b53",
+          "server.py": "4a8925b7abdbe2c3e9bf03cf7569ac94920773f0b76090ea17d5580f99558a7a",
+          "shared_memory.py": "990cec1f9499a062d2c0d3dcdf09bc81bb1bd1b3894bcffd254b2c757a9142ce",
+          "transport.py": "7746e452b9dfb256ee274fab8ebe6962f8955168db87517f94dd7da57b131064",
+          "utils.py": "4dbdef4d213963052408de22d9aa51dde3db5ca6640b26d9a9c35111a053b50d"
+        },
+        "harness_files": {
+          "run_real_gpu.py": "4f074d57c36ff4b3e74992088b55de91f08d069e2034e28bce2622628ac2c484",
+          "real_gpu_worker.py": "61c56d67e67d3e13d910f772b99adf4c9d7513db0100d1321cc6b56c64ba6b9c",
+          "real_gpu_contract.py": "52285fa96886dcd2f4f499630c4388e2c1afcd7741d4ea25d73ccc2c3a69f08d"
+        },
+        "manifest_sha256": "6562f4ed1e55339308b4f94e94fdf053686f32f44da3498d6fee05c51f3e7936"
+      },
+      "as_run_snapshots": [
+        "tuning-harness"
+      ],
+      "parallel_model_startup_seconds": 7.777775369002484
+    },
+    {
+      "name": "replicas4",
+      "status": "complete",
+      "summary": [
+        {
+          "run": "replicas4",
+          "label": "master-7609bff-replicas4",
+          "mode": "shm_session_cached",
+          "replicas": 4,
+          "schedule": "model_parallel",
+          "decode": "preloaded",
+          "batch_size": 1,
+          "batch_inference": false,
+          "sites_per_repeat": 64,
+          "repeats": 5,
+          "median_seconds": 4.177998630912043,
+          "first_repeat_seconds": 4.156955184065737,
+          "median_seconds_excluding_first": 4.185806422960013,
+          "median_sites_per_second_excluding_first": 15.289819024635262,
+          "median_sites_per_second_all_five_models": 15.318339150826628,
+          "median_sites_per_hour_all_five_models": 55146.02094297586,
+          "minimum_seconds": 4.156955184065737,
+          "maximum_seconds": 4.206403575022705,
+          "median_request_ms": 126.78028806112707,
+          "median_nonprocessor_request_ms_mean": 3.223076289486926,
+          "gpu_mean_utilization_percent": {
+            "0": 30.378095238095238,
+            "1": 59.96333333333333,
+            "2": 99.82857142857142,
+            "3": 47.48571428571429
+          },
+          "gpu_peak_memory_mib": {
+            "0": 4162.0,
+            "1": 4466.0,
+            "2": 9874.0,
+            "3": 10898.0
+          },
+          "peak_pytorch_allocated_gib": 1.8750190734863281,
+          "validation_cases": 96,
+          "validation_passed": true,
+          "validation_exact": true
+        }
+      ],
+      "report_sha256": "4a08f16a0508673c88157e3667bbff6b9ac4d5013d02380adbe6c32961142e48",
+      "code": {
+        "nahual_root": "/work/users/amunoz/worktrees/nahual-real-gpu-bench/src/nahual",
+        "nahual_files": {
+          "preprocess.py": "5899841a1e33e26c46c8f6446c656a2aac861c2451a328e5c200b86680a668af",
+          "process.py": "8c78c1ada3a8e7f6c3b10aafcb5d9d36ee9ed3098395608b00d2bfe2d1f10a04",
+          "serial.py": "632628171e5bfb7f728d8661542c4a24a0cd28379f4c26c064588acd02063b53",
+          "server.py": "4a8925b7abdbe2c3e9bf03cf7569ac94920773f0b76090ea17d5580f99558a7a",
+          "shared_memory.py": "990cec1f9499a062d2c0d3dcdf09bc81bb1bd1b3894bcffd254b2c757a9142ce",
+          "transport.py": "7746e452b9dfb256ee274fab8ebe6962f8955168db87517f94dd7da57b131064",
+          "utils.py": "4dbdef4d213963052408de22d9aa51dde3db5ca6640b26d9a9c35111a053b50d"
+        },
+        "harness_files": {
+          "run_real_gpu.py": "4f074d57c36ff4b3e74992088b55de91f08d069e2034e28bce2622628ac2c484",
+          "real_gpu_worker.py": "61c56d67e67d3e13d910f772b99adf4c9d7513db0100d1321cc6b56c64ba6b9c",
+          "real_gpu_contract.py": "52285fa96886dcd2f4f499630c4388e2c1afcd7741d4ea25d73ccc2c3a69f08d"
+        },
+        "manifest_sha256": "6562f4ed1e55339308b4f94e94fdf053686f32f44da3498d6fee05c51f3e7936"
+      },
+      "as_run_snapshots": [
+        "tuning-harness"
+      ],
+      "parallel_model_startup_seconds": 8.536442256066948
+    },
+    {
+      "name": "batch4",
+      "status": "failed",
+      "error": "RuntimeError: batch parity failure: dino_pair-0: 0.003906965255737305",
+      "timed_repeats": 0,
+      "report_sha256": "74cc13eece6e16a4c719212999c7a42fb3bcbe2bb7003395e0d7fece16394f2d",
+      "failed_validation": [
+        {
+          "kind": "batch_vs_single",
+          "mode": "shm_session_cached",
+          "worker": "dino_pair-0",
+          "shape": [
+            5,
+            1080,
+            1280
+          ],
+          "sites": 4,
+          "max_abs": 0.003906965255737305,
+          "exact": false,
+          "passed": false
+        }
+      ],
+      "as_run_snapshots": [
+        "tuning-harness"
+      ],
+      "code": {
+        "nahual_root": "/work/users/amunoz/worktrees/nahual-real-gpu-bench/src/nahual",
+        "nahual_files": {
+          "preprocess.py": "5899841a1e33e26c46c8f6446c656a2aac861c2451a328e5c200b86680a668af",
+          "process.py": "8c78c1ada3a8e7f6c3b10aafcb5d9d36ee9ed3098395608b00d2bfe2d1f10a04",
+          "serial.py": "632628171e5bfb7f728d8661542c4a24a0cd28379f4c26c064588acd02063b53",
+          "server.py": "4a8925b7abdbe2c3e9bf03cf7569ac94920773f0b76090ea17d5580f99558a7a",
+          "shared_memory.py": "990cec1f9499a062d2c0d3dcdf09bc81bb1bd1b3894bcffd254b2c757a9142ce",
+          "transport.py": "7746e452b9dfb256ee274fab8ebe6962f8955168db87517f94dd7da57b131064",
+          "utils.py": "4dbdef4d213963052408de22d9aa51dde3db5ca6640b26d9a9c35111a053b50d"
+        },
+        "harness_files": {
+          "run_real_gpu.py": "4f074d57c36ff4b3e74992088b55de91f08d069e2034e28bce2622628ac2c484",
+          "real_gpu_worker.py": "61c56d67e67d3e13d910f772b99adf4c9d7513db0100d1321cc6b56c64ba6b9c",
+          "real_gpu_contract.py": "52285fa96886dcd2f4f499630c4388e2c1afcd7741d4ea25d73ccc2c3a69f08d"
+        },
+        "manifest_sha256": "6562f4ed1e55339308b4f94e94fdf053686f32f44da3498d6fee05c51f3e7936"
+      }
+    },
+    {
+      "name": "batch8",
+      "status": "failed",
+      "error": "RuntimeError: batch parity failure: dino_pair-0: 0.0045084282755851746",
+      "timed_repeats": 0,
+      "report_sha256": "71413f4588faeb31cfe9b2bed5ac068d722226f283b434ed66db951d890810f0",
+      "failed_validation": [
+        {
+          "kind": "batch_vs_single",
+          "mode": "shm_session_cached",
+          "worker": "dino_pair-0",
+          "shape": [
+            5,
+            1080,
+            1280
+          ],
+          "sites": 8,
+          "max_abs": 0.0045084282755851746,
+          "exact": false,
+          "passed": false
+        }
+      ],
+      "as_run_snapshots": [
+        "tuning-harness"
+      ],
+      "code": {
+        "nahual_root": "/work/users/amunoz/worktrees/nahual-real-gpu-bench/src/nahual",
+        "nahual_files": {
+          "preprocess.py": "5899841a1e33e26c46c8f6446c656a2aac861c2451a328e5c200b86680a668af",
+          "process.py": "8c78c1ada3a8e7f6c3b10aafcb5d9d36ee9ed3098395608b00d2bfe2d1f10a04",
+          "serial.py": "632628171e5bfb7f728d8661542c4a24a0cd28379f4c26c064588acd02063b53",
+          "server.py": "4a8925b7abdbe2c3e9bf03cf7569ac94920773f0b76090ea17d5580f99558a7a",
+          "shared_memory.py": "990cec1f9499a062d2c0d3dcdf09bc81bb1bd1b3894bcffd254b2c757a9142ce",
+          "transport.py": "7746e452b9dfb256ee274fab8ebe6962f8955168db87517f94dd7da57b131064",
+          "utils.py": "4dbdef4d213963052408de22d9aa51dde3db5ca6640b26d9a9c35111a053b50d"
+        },
+        "harness_files": {
+          "run_real_gpu.py": "4f074d57c36ff4b3e74992088b55de91f08d069e2034e28bce2622628ac2c484",
+          "real_gpu_worker.py": "61c56d67e67d3e13d910f772b99adf4c9d7513db0100d1321cc6b56c64ba6b9c",
+          "real_gpu_contract.py": "52285fa96886dcd2f4f499630c4388e2c1afcd7741d4ea25d73ccc2c3a69f08d"
+        },
+        "manifest_sha256": "6562f4ed1e55339308b4f94e94fdf053686f32f44da3498d6fee05c51f3e7936"
+      }
+    },
+    {
+      "name": "data-parallel",
+      "status": "complete",
+      "summary": [
+        {
+          "run": "data-parallel",
+          "label": "master-7609bff-data-parallel",
+          "mode": "shm_session_cached",
+          "replicas": 4,
+          "schedule": "data_parallel",
+          "decode": "preloaded",
+          "batch_size": 1,
+          "batch_inference": false,
+          "sites_per_repeat": 64,
+          "repeats": 5,
+          "median_seconds": 2.6413444209611043,
+          "first_repeat_seconds": 2.6803143040742725,
+          "median_seconds_excluding_first": 2.6370259624673054,
+          "median_sites_per_second_excluding_first": 24.269829932462613,
+          "median_sites_per_second_all_five_models": 24.230085062784944,
+          "median_sites_per_hour_all_five_models": 87228.3062260258,
+          "minimum_seconds": 2.6071673119440675,
+          "maximum_seconds": 2.691938834032044,
+          "median_request_ms": 165.9839364583604,
+          "median_nonprocessor_request_ms_mean": 4.44309971317125,
+          "gpu_mean_utilization_percent": {
+            "0": 81.69450549450549,
+            "1": 83.24945054945056,
+            "2": 82.73736263736264,
+            "3": 84.46923076923076
+          },
+          "gpu_peak_memory_mib": {
+            "0": 4275.0,
+            "1": 4275.0,
+            "2": 4275.0,
+            "3": 4275.0
+          },
+          "peak_pytorch_allocated_gib": 2.791152000427246,
+          "validation_cases": 24,
+          "validation_passed": true,
+          "validation_exact": true
+        }
+      ],
+      "report_sha256": "445ac7640e3c42a1c12d0adcd553f5bd9c564562ae1a7fa669e5b534fa88bc8e",
+      "code": {
+        "nahual_root": "/work/users/amunoz/worktrees/nahual-real-gpu-bench/src/nahual",
+        "nahual_files": {
+          "preprocess.py": "5899841a1e33e26c46c8f6446c656a2aac861c2451a328e5c200b86680a668af",
+          "process.py": "8c78c1ada3a8e7f6c3b10aafcb5d9d36ee9ed3098395608b00d2bfe2d1f10a04",
+          "serial.py": "632628171e5bfb7f728d8661542c4a24a0cd28379f4c26c064588acd02063b53",
+          "server.py": "4a8925b7abdbe2c3e9bf03cf7569ac94920773f0b76090ea17d5580f99558a7a",
+          "shared_memory.py": "990cec1f9499a062d2c0d3dcdf09bc81bb1bd1b3894bcffd254b2c757a9142ce",
+          "transport.py": "7746e452b9dfb256ee274fab8ebe6962f8955168db87517f94dd7da57b131064",
+          "utils.py": "4dbdef4d213963052408de22d9aa51dde3db5ca6640b26d9a9c35111a053b50d"
+        },
+        "harness_files": {
+          "run_real_gpu.py": "4f074d57c36ff4b3e74992088b55de91f08d069e2034e28bce2622628ac2c484",
+          "real_gpu_worker.py": "61c56d67e67d3e13d910f772b99adf4c9d7513db0100d1321cc6b56c64ba6b9c",
+          "real_gpu_contract.py": "52285fa96886dcd2f4f499630c4388e2c1afcd7741d4ea25d73ccc2c3a69f08d"
+        },
+        "manifest_sha256": "6562f4ed1e55339308b4f94e94fdf053686f32f44da3498d6fee05c51f3e7936"
+      },
+      "as_run_snapshots": [
+        "tuning-harness"
+      ],
+      "parallel_model_startup_seconds": 10.264528819010593
+    },
+    {
+      "name": "tiff-data-parallel",
+      "status": "complete",
+      "summary": [
+        {
+          "run": "tiff-data-parallel",
+          "label": "master-7609bff-tiff-data-parallel",
+          "mode": "shm_session_cached",
+          "replicas": 4,
+          "schedule": "data_parallel",
+          "decode": "tiff",
+          "batch_size": 1,
+          "batch_inference": false,
+          "sites_per_repeat": 64,
+          "repeats": 5,
+          "median_seconds": 4.157507363939658,
+          "first_repeat_seconds": 2.9157252449076623,
+          "median_seconds_excluding_first": 4.211714155448135,
+          "median_sites_per_second_excluding_first": 15.198230684620862,
+          "median_sites_per_second_all_five_models": 15.393839240095426,
+          "median_sites_per_hour_all_five_models": 55417.82126434353,
+          "minimum_seconds": 2.9157252449076623,
+          "maximum_seconds": 4.273038161918521,
+          "median_request_ms": 168.62243902869523,
+          "median_nonprocessor_request_ms_mean": 25.425021602131892,
+          "gpu_mean_utilization_percent": {
+            "0": 56.7731328320802,
+            "1": 55.6295739348371,
+            "2": 56.04711779448621,
+            "3": 59.34395989974937
+          },
+          "gpu_peak_memory_mib": {
+            "0": 4275.0,
+            "1": 4275.0,
+            "2": 4275.0,
+            "3": 4275.0
+          },
+          "peak_pytorch_allocated_gib": 2.791152000427246,
+          "validation_cases": 24,
+          "validation_passed": true,
+          "validation_exact": true
+        }
+      ],
+      "report_sha256": "b9b8086354551bf7e00fb4db348f04664007607f4a61166f7141abfe74467a38",
+      "code": {
+        "nahual_root": "/work/users/amunoz/worktrees/nahual-real-gpu-bench/src/nahual",
+        "nahual_files": {
+          "preprocess.py": "5899841a1e33e26c46c8f6446c656a2aac861c2451a328e5c200b86680a668af",
+          "process.py": "8c78c1ada3a8e7f6c3b10aafcb5d9d36ee9ed3098395608b00d2bfe2d1f10a04",
+          "serial.py": "632628171e5bfb7f728d8661542c4a24a0cd28379f4c26c064588acd02063b53",
+          "server.py": "4a8925b7abdbe2c3e9bf03cf7569ac94920773f0b76090ea17d5580f99558a7a",
+          "shared_memory.py": "990cec1f9499a062d2c0d3dcdf09bc81bb1bd1b3894bcffd254b2c757a9142ce",
+          "transport.py": "7746e452b9dfb256ee274fab8ebe6962f8955168db87517f94dd7da57b131064",
+          "utils.py": "4dbdef4d213963052408de22d9aa51dde3db5ca6640b26d9a9c35111a053b50d"
+        },
+        "harness_files": {
+          "run_real_gpu.py": "4f074d57c36ff4b3e74992088b55de91f08d069e2034e28bce2622628ac2c484",
+          "real_gpu_worker.py": "61c56d67e67d3e13d910f772b99adf4c9d7513db0100d1321cc6b56c64ba6b9c",
+          "real_gpu_contract.py": "52285fa96886dcd2f4f499630c4388e2c1afcd7741d4ea25d73ccc2c3a69f08d"
+        },
+        "manifest_sha256": "6562f4ed1e55339308b4f94e94fdf053686f32f44da3498d6fee05c51f3e7936"
+      },
+      "as_run_snapshots": [
+        "tuning-harness"
+      ],
+      "parallel_model_startup_seconds": 10.51490303198807
+    },
+    {
+      "name": "mq-baseline",
+      "status": "complete",
+      "summary": [
+        {
+          "run": "mq-baseline",
+          "label": "baseline-56aa3fe-mq-baseline",
+          "mode": "wire_once",
+          "replicas": 1,
+          "schedule": "model_parallel",
+          "decode": "zarr_mq",
+          "batch_size": 1,
+          "batch_inference": false,
+          "sites_per_repeat": 64,
+          "repeats": 5,
+          "median_seconds": 9.129194270935841,
+          "first_repeat_seconds": 9.766638245084323,
+          "median_seconds_excluding_first": 9.066659182484727,
+          "median_sites_per_second_excluding_first": 7.059165176002298,
+          "median_sites_per_second_all_five_models": 7.010476291840299,
+          "median_sites_per_hour_all_five_models": 25237.714650625076,
+          "minimum_seconds": 8.993249704944901,
+          "maximum_seconds": 9.766638245084323,
+          "median_request_ms": 113.08337096124887,
+          "median_nonprocessor_request_ms_mean": 81.14212812961341,
+          "gpu_mean_utilization_percent": {
+            "0": 12.690590555062604,
+            "1": 24.301721384205855,
+            "2": 38.268585231193924,
+            "3": 18.633942620526472
+          },
+          "gpu_peak_memory_mib": {
+            "0": 1043.0,
+            "1": 1119.0,
+            "2": 2471.0,
+            "3": 2727.0
+          },
+          "peak_pytorch_allocated_gib": 1.8750190734863281,
+          "validation_cases": 24,
+          "validation_passed": true,
+          "validation_exact": true
+        },
+        {
+          "run": "mq-baseline",
+          "label": "baseline-56aa3fe-mq-baseline",
+          "mode": "shm_once",
+          "replicas": 1,
+          "schedule": "model_parallel",
+          "decode": "zarr_mq",
+          "batch_size": 1,
+          "batch_inference": false,
+          "sites_per_repeat": 64,
+          "repeats": 5,
+          "median_seconds": 5.648214594111778,
+          "first_repeat_seconds": 5.58598722203169,
+          "median_seconds_excluding_first": 5.6591596335638314,
+          "median_sites_per_second_excluding_first": 11.309141911094276,
+          "median_sites_per_second_all_five_models": 11.331014240627388,
+          "median_sites_per_hour_all_five_models": 40791.651266258596,
+          "minimum_seconds": 5.585703090997413,
+          "maximum_seconds": 5.73324050696101,
+          "median_request_ms": 58.08050453197211,
+          "median_nonprocessor_request_ms_mean": 22.85883906915842,
+          "gpu_mean_utilization_percent": {
+            "0": 20.583597883597882,
+            "1": 40.856084656084654,
+            "2": 62.58412698412698,
+            "3": 29.553439153439154
+          },
+          "gpu_peak_memory_mib": {
+            "0": 1043.0,
+            "1": 1119.0,
+            "2": 2471.0,
+            "3": 2727.0
+          },
+          "peak_pytorch_allocated_gib": 1.8750190734863281,
+          "validation_cases": 24,
+          "validation_passed": true,
+          "validation_exact": true
+        }
+      ],
+      "report_sha256": "5dd91f571127b01dc48b43bafb4f5cbe9fda16307796670382289ada7d358a7b",
+      "code": {
+        "nahual_root": "/work/scratch/amunoz/nahual-real-gpu-20261102/baseline/src/nahual",
+        "nahual_files": {
+          "preprocess.py": "5899841a1e33e26c46c8f6446c656a2aac861c2451a328e5c200b86680a668af",
+          "process.py": "13417566be079e374142b9c5f24af99d69d3f39cbbdb33e03dac0572862dae6a",
+          "serial.py": "981a9ed94f143c41838c03b6aeaa615420c16ec72865cff80014a671107717f8",
+          "server.py": "4a8925b7abdbe2c3e9bf03cf7569ac94920773f0b76090ea17d5580f99558a7a",
+          "shared_memory.py": "95733abac5552184e673b01e219a01f058d9bae33ffb30cb2dc283dcee70e4c3",
+          "transport.py": "02f874ee3a7eddab4187150b5df9a12d4ede143858fb74d623450e16ab8c5faa",
+          "utils.py": "4dbdef4d213963052408de22d9aa51dde3db5ca6640b26d9a9c35111a053b50d"
+        },
+        "harness_files": {
+          "run_real_gpu.py": "4f074d57c36ff4b3e74992088b55de91f08d069e2034e28bce2622628ac2c484",
+          "real_gpu_worker.py": "61c56d67e67d3e13d910f772b99adf4c9d7513db0100d1321cc6b56c64ba6b9c",
+          "real_gpu_contract.py": "52285fa96886dcd2f4f499630c4388e2c1afcd7741d4ea25d73ccc2c3a69f08d"
+        },
+        "manifest_sha256": "427ef592e5c6eb7f5c80a7e5d35bb681e4ae14461947dea5e965b68dbe0288f5"
+      },
+      "as_run_snapshots": [
+        "tuning-harness"
+      ],
+      "parallel_model_startup_seconds": 7.014020378002897
+    },
+    {
+      "name": "mq-master",
+      "status": "complete",
+      "summary": [
+        {
+          "run": "mq-master",
+          "label": "master-7609bff-mq-master",
+          "mode": "wire_once",
+          "replicas": 1,
+          "schedule": "model_parallel",
+          "decode": "zarr_mq",
+          "batch_size": 1,
+          "batch_inference": false,
+          "sites_per_repeat": 64,
+          "repeats": 5,
+          "median_seconds": 5.4538834689883515,
+          "first_repeat_seconds": 7.408904084935784,
+          "median_seconds_excluding_first": 5.450899751507677,
+          "median_sites_per_second_excluding_first": 11.74118440874761,
+          "median_sites_per_second_all_five_models": 11.734757510664497,
+          "median_sites_per_hour_all_five_models": 42245.12703839219,
+          "minimum_seconds": 5.38990890502464,
+          "maximum_seconds": 7.408904084935784,
+          "median_request_ms": 51.27874849131331,
+          "median_nonprocessor_request_ms_mean": 17.77633450092253,
+          "gpu_mean_utilization_percent": {
+            "0": 19.68972543972544,
+            "1": 38.575175175175175,
+            "2": 62.23497783497783,
+            "3": 28.643557843557844
+          },
+          "gpu_peak_memory_mib": {
+            "0": 1043.0,
+            "1": 1119.0,
+            "2": 2471.0,
+            "3": 2727.0
+          },
+          "peak_pytorch_allocated_gib": 1.8750190734863281,
+          "validation_cases": 24,
+          "validation_passed": true,
+          "validation_exact": true
+        },
+        {
+          "run": "mq-master",
+          "label": "master-7609bff-mq-master",
+          "mode": "shm_session_cached",
+          "replicas": 1,
+          "schedule": "model_parallel",
+          "decode": "zarr_mq",
+          "batch_size": 1,
+          "batch_inference": false,
+          "sites_per_repeat": 64,
+          "repeats": 5,
+          "median_seconds": 4.711449716007337,
+          "first_repeat_seconds": 4.711449716007337,
+          "median_seconds_excluding_first": 4.708580338512547,
+          "median_sites_per_second_excluding_first": 13.5922357469274,
+          "median_sites_per_second_all_five_models": 13.583929333376405,
+          "median_sites_per_hour_all_five_models": 48902.14560015506,
+          "minimum_seconds": 4.692844539997168,
+          "maximum_seconds": 4.745829745079391,
+          "median_request_ms": 39.83077855082229,
+          "median_nonprocessor_request_ms_mean": 5.028249519909878,
+          "gpu_mean_utilization_percent": {
+            "0": 24.081521739130434,
+            "1": 48.25833333333333,
+            "2": 77.91557971014493,
+            "3": 36.653260869565216
+          },
+          "gpu_peak_memory_mib": {
+            "0": 1043.0,
+            "1": 1119.0,
+            "2": 2471.0,
+            "3": 2727.0
+          },
+          "peak_pytorch_allocated_gib": 1.8750190734863281,
+          "validation_cases": 24,
+          "validation_passed": true,
+          "validation_exact": true
+        }
+      ],
+      "report_sha256": "d500659b4cc265c8852d1a3ed9df3843c2cfa6737370e380ae4f5d237ed1216d",
+      "code": {
+        "nahual_root": "/work/users/amunoz/worktrees/nahual-real-gpu-bench/src/nahual",
+        "nahual_files": {
+          "preprocess.py": "5899841a1e33e26c46c8f6446c656a2aac861c2451a328e5c200b86680a668af",
+          "process.py": "8c78c1ada3a8e7f6c3b10aafcb5d9d36ee9ed3098395608b00d2bfe2d1f10a04",
+          "serial.py": "632628171e5bfb7f728d8661542c4a24a0cd28379f4c26c064588acd02063b53",
+          "server.py": "4a8925b7abdbe2c3e9bf03cf7569ac94920773f0b76090ea17d5580f99558a7a",
+          "shared_memory.py": "990cec1f9499a062d2c0d3dcdf09bc81bb1bd1b3894bcffd254b2c757a9142ce",
+          "transport.py": "7746e452b9dfb256ee274fab8ebe6962f8955168db87517f94dd7da57b131064",
+          "utils.py": "4dbdef4d213963052408de22d9aa51dde3db5ca6640b26d9a9c35111a053b50d"
+        },
+        "harness_files": {
+          "run_real_gpu.py": "4f074d57c36ff4b3e74992088b55de91f08d069e2034e28bce2622628ac2c484",
+          "real_gpu_worker.py": "61c56d67e67d3e13d910f772b99adf4c9d7513db0100d1321cc6b56c64ba6b9c",
+          "real_gpu_contract.py": "52285fa96886dcd2f4f499630c4388e2c1afcd7741d4ea25d73ccc2c3a69f08d"
+        },
+        "manifest_sha256": "427ef592e5c6eb7f5c80a7e5d35bb681e4ae14461947dea5e965b68dbe0288f5"
+      },
+      "as_run_snapshots": [
+        "tuning-harness"
+      ],
+      "parallel_model_startup_seconds": 7.516235537012108
+    },
+    {
+      "name": "mq-data-parallel",
+      "status": "complete",
+      "summary": [
+        {
+          "run": "mq-data-parallel",
+          "label": "master-7609bff-mq-data-parallel",
+          "mode": "shm_session_cached",
+          "replicas": 4,
+          "schedule": "data_parallel",
+          "decode": "zarr_mq",
+          "batch_size": 1,
+          "batch_inference": false,
+          "sites_per_repeat": 64,
+          "repeats": 5,
+          "median_seconds": 2.816577691002749,
+          "first_repeat_seconds": 6.916389885009266,
+          "median_seconds_excluding_first": 2.8024655585177243,
+          "median_sites_per_second_excluding_first": 22.83761265869284,
+          "median_sites_per_second_all_five_models": 22.722611275535215,
+          "median_sites_per_hour_all_five_models": 81801.40059192678,
+          "minimum_seconds": 2.787905225995928,
+          "maximum_seconds": 6.916389885009266,
+          "median_request_ms": 168.4258885215968,
+          "median_nonprocessor_request_ms_mean": 5.4704413159925025,
+          "gpu_mean_utilization_percent": {
+            "0": 69.78,
+            "1": 69.56571428571428,
+            "2": 69.83142857142857,
+            "3": 71.49142857142857
+          },
+          "gpu_peak_memory_mib": {
+            "0": 4275.0,
+            "1": 4275.0,
+            "2": 4275.0,
+            "3": 4275.0
+          },
+          "peak_pytorch_allocated_gib": 2.791152000427246,
+          "validation_cases": 24,
+          "validation_passed": true,
+          "validation_exact": true
+        }
+      ],
+      "report_sha256": "105a9ab6b6bbe9566224e7b70d78ff233530ef6f97601ec985ccafd6769faede",
+      "code": {
+        "nahual_root": "/work/users/amunoz/worktrees/nahual-real-gpu-bench/src/nahual",
+        "nahual_files": {
+          "preprocess.py": "5899841a1e33e26c46c8f6446c656a2aac861c2451a328e5c200b86680a668af",
+          "process.py": "8c78c1ada3a8e7f6c3b10aafcb5d9d36ee9ed3098395608b00d2bfe2d1f10a04",
+          "serial.py": "632628171e5bfb7f728d8661542c4a24a0cd28379f4c26c064588acd02063b53",
+          "server.py": "4a8925b7abdbe2c3e9bf03cf7569ac94920773f0b76090ea17d5580f99558a7a",
+          "shared_memory.py": "990cec1f9499a062d2c0d3dcdf09bc81bb1bd1b3894bcffd254b2c757a9142ce",
+          "transport.py": "7746e452b9dfb256ee274fab8ebe6962f8955168db87517f94dd7da57b131064",
+          "utils.py": "4dbdef4d213963052408de22d9aa51dde3db5ca6640b26d9a9c35111a053b50d"
+        },
+        "harness_files": {
+          "run_real_gpu.py": "4f074d57c36ff4b3e74992088b55de91f08d069e2034e28bce2622628ac2c484",
+          "real_gpu_worker.py": "61c56d67e67d3e13d910f772b99adf4c9d7513db0100d1321cc6b56c64ba6b9c",
+          "real_gpu_contract.py": "52285fa96886dcd2f4f499630c4388e2c1afcd7741d4ea25d73ccc2c3a69f08d"
+        },
+        "manifest_sha256": "427ef592e5c6eb7f5c80a7e5d35bb681e4ae14461947dea5e965b68dbe0288f5"
+      },
+      "as_run_snapshots": [
+        "tuning-harness"
+      ],
+      "parallel_model_startup_seconds": 10.514478642027825
+    },
+    {
+      "name": "zmq-raw",
+      "status": "complete",
+      "summary": [
+        {
+          "run": "zmq-raw",
+          "label": "master-7609bff-zmq-raw",
+          "mode": "zmq_session",
+          "replicas": 1,
+          "schedule": "model_parallel",
+          "decode": "preloaded",
+          "batch_size": 1,
+          "batch_inference": false,
+          "sites_per_repeat": 64,
+          "repeats": 5,
+          "median_seconds": 4.482787440996617,
+          "first_repeat_seconds": 4.489021265995689,
+          "median_seconds_excluding_first": 4.466311901982408,
+          "median_sites_per_second_excluding_first": 14.329691320730678,
+          "median_sites_per_second_all_five_models": 14.27683128909888,
+          "median_sites_per_hour_all_five_models": 51396.59264075597,
+          "minimum_seconds": 4.449513423023745,
+          "maximum_seconds": 4.496494262944907,
+          "median_request_ms": 40.171344473492354,
+          "median_nonprocessor_request_ms_mean": 6.2405599542216805,
+          "gpu_mean_utilization_percent": {
+            "0": 26.200395256916998,
+            "1": 50.880237154150194,
+            "2": 80.78260869565217,
+            "3": 37.60079051383399
+          },
+          "gpu_peak_memory_mib": {
+            "0": 1043.0,
+            "1": 1119.0,
+            "2": 2471.0,
+            "3": 2727.0
+          },
+          "peak_pytorch_allocated_gib": 1.8750190734863281,
+          "validation_cases": 24,
+          "validation_passed": true,
+          "validation_exact": true
+        }
+      ],
+      "report_sha256": "7f06fb508377c3bc6d129d0275592f69c495e20f886504ead024584617cf2b43",
+      "code": {
+        "nahual_root": "/work/users/amunoz/worktrees/nahual-real-gpu-bench/src/nahual",
+        "nahual_files": {
+          "preprocess.py": "5899841a1e33e26c46c8f6446c656a2aac861c2451a328e5c200b86680a668af",
+          "process.py": "8c78c1ada3a8e7f6c3b10aafcb5d9d36ee9ed3098395608b00d2bfe2d1f10a04",
+          "serial.py": "632628171e5bfb7f728d8661542c4a24a0cd28379f4c26c064588acd02063b53",
+          "server.py": "4a8925b7abdbe2c3e9bf03cf7569ac94920773f0b76090ea17d5580f99558a7a",
+          "shared_memory.py": "990cec1f9499a062d2c0d3dcdf09bc81bb1bd1b3894bcffd254b2c757a9142ce",
+          "transport.py": "7746e452b9dfb256ee274fab8ebe6962f8955168db87517f94dd7da57b131064",
+          "utils.py": "4dbdef4d213963052408de22d9aa51dde3db5ca6640b26d9a9c35111a053b50d"
+        },
+        "harness_files": {
+          "run_real_gpu.py": "f479c1fd28949e76d334e0ab9b09ad5a4c1c9891c8a1a16ac084b9595f0a0998",
+          "real_gpu_worker.py": "aea2cc49219af4a342ec81f41e8adf475c613c29414a31617061efe182096089",
+          "real_gpu_contract.py": "52285fa96886dcd2f4f499630c4388e2c1afcd7741d4ea25d73ccc2c3a69f08d",
+          "real_gpu_zmq.py": "aa1ed6f1b5ec3cb9a1416f59e0d10231d2d4401b336c8285f0ebae8c2295f370"
+        },
+        "manifest_sha256": "6562f4ed1e55339308b4f94e94fdf053686f32f44da3498d6fee05c51f3e7936"
+      },
+      "as_run_snapshots": [
+        "zmq-harness"
+      ],
+      "parallel_model_startup_seconds": 7.262724210973829
+    },
+    {
+      "name": "zmq-raw-data-parallel",
+      "status": "complete",
+      "summary": [
+        {
+          "run": "zmq-raw-data-parallel",
+          "label": "master-7609bff-zmq-raw-data-parallel",
+          "mode": "zmq_session",
+          "replicas": 4,
+          "schedule": "data_parallel",
+          "decode": "preloaded",
+          "batch_size": 1,
+          "batch_inference": false,
+          "sites_per_repeat": 64,
+          "repeats": 5,
+          "median_seconds": 2.6469249660149217,
+          "first_repeat_seconds": 2.6839738769922405,
+          "median_seconds_excluding_first": 2.6434729780303314,
+          "median_sites_per_second_excluding_first": 24.21061598445369,
+          "median_sites_per_second_all_five_models": 24.179000471008898,
+          "median_sites_per_hour_all_five_models": 87044.40169563203,
+          "minimum_seconds": 2.6091421640012413,
+          "maximum_seconds": 2.6839738769922405,
+          "median_request_ms": 166.29525646567345,
+          "median_nonprocessor_request_ms_mean": 6.023042045853799,
+          "gpu_mean_utilization_percent": {
+            "0": 82.53846153846153,
+            "1": 84.00549450549451,
+            "2": 83.53736263736263,
+            "3": 84.78241758241758
+          },
+          "gpu_peak_memory_mib": {
+            "0": 4275.0,
+            "1": 4275.0,
+            "2": 4275.0,
+            "3": 4275.0
+          },
+          "peak_pytorch_allocated_gib": 2.791152000427246,
+          "validation_cases": 24,
+          "validation_passed": true,
+          "validation_exact": true
+        }
+      ],
+      "report_sha256": "79bc6f538fbd90fc3c47912e95c522166d4105c3f785df40d9a69db42f6098df",
+      "code": {
+        "nahual_root": "/work/users/amunoz/worktrees/nahual-real-gpu-bench/src/nahual",
+        "nahual_files": {
+          "preprocess.py": "5899841a1e33e26c46c8f6446c656a2aac861c2451a328e5c200b86680a668af",
+          "process.py": "8c78c1ada3a8e7f6c3b10aafcb5d9d36ee9ed3098395608b00d2bfe2d1f10a04",
+          "serial.py": "632628171e5bfb7f728d8661542c4a24a0cd28379f4c26c064588acd02063b53",
+          "server.py": "4a8925b7abdbe2c3e9bf03cf7569ac94920773f0b76090ea17d5580f99558a7a",
+          "shared_memory.py": "990cec1f9499a062d2c0d3dcdf09bc81bb1bd1b3894bcffd254b2c757a9142ce",
+          "transport.py": "7746e452b9dfb256ee274fab8ebe6962f8955168db87517f94dd7da57b131064",
+          "utils.py": "4dbdef4d213963052408de22d9aa51dde3db5ca6640b26d9a9c35111a053b50d"
+        },
+        "harness_files": {
+          "run_real_gpu.py": "f479c1fd28949e76d334e0ab9b09ad5a4c1c9891c8a1a16ac084b9595f0a0998",
+          "real_gpu_worker.py": "aea2cc49219af4a342ec81f41e8adf475c613c29414a31617061efe182096089",
+          "real_gpu_contract.py": "52285fa96886dcd2f4f499630c4388e2c1afcd7741d4ea25d73ccc2c3a69f08d",
+          "real_gpu_zmq.py": "aa1ed6f1b5ec3cb9a1416f59e0d10231d2d4401b336c8285f0ebae8c2295f370"
+        },
+        "manifest_sha256": "6562f4ed1e55339308b4f94e94fdf053686f32f44da3498d6fee05c51f3e7936"
+      },
+      "as_run_snapshots": [
+        "zmq-harness"
+      ],
+      "parallel_model_startup_seconds": 10.514836151967756
+    },
+    {
+      "name": "zmq-mq",
+      "status": "complete",
+      "summary": [
+        {
+          "run": "zmq-mq",
+          "label": "master-7609bff-zmq-mq",
+          "mode": "zmq_session",
+          "replicas": 1,
+          "schedule": "model_parallel",
+          "decode": "zarr_mq",
+          "batch_size": 1,
+          "batch_inference": false,
+          "sites_per_repeat": 64,
+          "repeats": 5,
+          "median_seconds": 4.604458045097999,
+          "first_repeat_seconds": 8.403243552078493,
+          "median_seconds_excluding_first": 4.600384911580477,
+          "median_sites_per_second_excluding_first": 13.911890287591028,
+          "median_sites_per_second_all_five_models": 13.899572842918118,
+          "median_sites_per_hour_all_five_models": 50038.46223450523,
+          "minimum_seconds": 4.54621900501661,
+          "maximum_seconds": 8.403243552078493,
+          "median_request_ms": 40.68627947708592,
+          "median_nonprocessor_request_ms_mean": 5.724075163016096,
+          "gpu_mean_utilization_percent": {
+            "0": 22.941116130246566,
+            "1": 44.349915302089215,
+            "2": 71.03423677771504,
+            "3": 34.43278750235272
+          },
+          "gpu_peak_memory_mib": {
+            "0": 1043.0,
+            "1": 1119.0,
+            "2": 2471.0,
+            "3": 2727.0
+          },
+          "peak_pytorch_allocated_gib": 1.8750190734863281,
+          "validation_cases": 24,
+          "validation_passed": true,
+          "validation_exact": true
+        }
+      ],
+      "report_sha256": "63d6ca485f6d8eda3b5a6750bd15ece5cf1c3f51a44f26659781634a1a58d581",
+      "code": {
+        "nahual_root": "/work/users/amunoz/worktrees/nahual-real-gpu-bench/src/nahual",
+        "nahual_files": {
+          "preprocess.py": "5899841a1e33e26c46c8f6446c656a2aac861c2451a328e5c200b86680a668af",
+          "process.py": "8c78c1ada3a8e7f6c3b10aafcb5d9d36ee9ed3098395608b00d2bfe2d1f10a04",
+          "serial.py": "632628171e5bfb7f728d8661542c4a24a0cd28379f4c26c064588acd02063b53",
+          "server.py": "4a8925b7abdbe2c3e9bf03cf7569ac94920773f0b76090ea17d5580f99558a7a",
+          "shared_memory.py": "990cec1f9499a062d2c0d3dcdf09bc81bb1bd1b3894bcffd254b2c757a9142ce",
+          "transport.py": "7746e452b9dfb256ee274fab8ebe6962f8955168db87517f94dd7da57b131064",
+          "utils.py": "4dbdef4d213963052408de22d9aa51dde3db5ca6640b26d9a9c35111a053b50d"
+        },
+        "harness_files": {
+          "run_real_gpu.py": "f479c1fd28949e76d334e0ab9b09ad5a4c1c9891c8a1a16ac084b9595f0a0998",
+          "real_gpu_worker.py": "aea2cc49219af4a342ec81f41e8adf475c613c29414a31617061efe182096089",
+          "real_gpu_contract.py": "52285fa96886dcd2f4f499630c4388e2c1afcd7741d4ea25d73ccc2c3a69f08d",
+          "real_gpu_zmq.py": "aa1ed6f1b5ec3cb9a1416f59e0d10231d2d4401b336c8285f0ebae8c2295f370"
+        },
+        "manifest_sha256": "427ef592e5c6eb7f5c80a7e5d35bb681e4ae14461947dea5e965b68dbe0288f5"
+      },
+      "as_run_snapshots": [
+        "zmq-harness"
+      ],
+      "parallel_model_startup_seconds": 7.012729287031107
+    },
+    {
+      "name": "zmq-mq-data-parallel",
+      "status": "complete",
+      "summary": [
+        {
+          "run": "zmq-mq-data-parallel",
+          "label": "master-7609bff-zmq-mq-data-parallel",
+          "mode": "zmq_session",
+          "replicas": 4,
+          "schedule": "data_parallel",
+          "decode": "zarr_mq",
+          "batch_size": 1,
+          "batch_inference": false,
+          "sites_per_repeat": 64,
+          "repeats": 5,
+          "median_seconds": 3.0929054769221693,
+          "first_repeat_seconds": 8.531017742003314,
+          "median_seconds_excluding_first": 2.95352580799954,
+          "median_sites_per_second_excluding_first": 21.717380965007184,
+          "median_sites_per_second_all_five_models": 20.692517271393648,
+          "median_sites_per_hour_all_five_models": 74493.06217701713,
+          "minimum_seconds": 2.796460244106129,
+          "maximum_seconds": 8.531017742003314,
+          "median_request_ms": 166.5372319985181,
+          "median_nonprocessor_request_ms_mean": 6.930788342287997,
+          "gpu_mean_utilization_percent": {
+            "0": 63.22739479512735,
+            "1": 64.41614064230343,
+            "2": 65.00764673311186,
+            "3": 65.69575027685492
+          },
+          "gpu_peak_memory_mib": {
+            "0": 4275.0,
+            "1": 4275.0,
+            "2": 4275.0,
+            "3": 4275.0
+          },
+          "peak_pytorch_allocated_gib": 2.791152000427246,
+          "validation_cases": 24,
+          "validation_passed": true,
+          "validation_exact": true
+        }
+      ],
+      "report_sha256": "bb1ff4315978197c8eb332c34ca7e7f29073623340490ea7e68f920211493c53",
+      "code": {
+        "nahual_root": "/work/users/amunoz/worktrees/nahual-real-gpu-bench/src/nahual",
+        "nahual_files": {
+          "preprocess.py": "5899841a1e33e26c46c8f6446c656a2aac861c2451a328e5c200b86680a668af",
+          "process.py": "8c78c1ada3a8e7f6c3b10aafcb5d9d36ee9ed3098395608b00d2bfe2d1f10a04",
+          "serial.py": "632628171e5bfb7f728d8661542c4a24a0cd28379f4c26c064588acd02063b53",
+          "server.py": "4a8925b7abdbe2c3e9bf03cf7569ac94920773f0b76090ea17d5580f99558a7a",
+          "shared_memory.py": "990cec1f9499a062d2c0d3dcdf09bc81bb1bd1b3894bcffd254b2c757a9142ce",
+          "transport.py": "7746e452b9dfb256ee274fab8ebe6962f8955168db87517f94dd7da57b131064",
+          "utils.py": "4dbdef4d213963052408de22d9aa51dde3db5ca6640b26d9a9c35111a053b50d"
+        },
+        "harness_files": {
+          "run_real_gpu.py": "f479c1fd28949e76d334e0ab9b09ad5a4c1c9891c8a1a16ac084b9595f0a0998",
+          "real_gpu_worker.py": "aea2cc49219af4a342ec81f41e8adf475c613c29414a31617061efe182096089",
+          "real_gpu_contract.py": "52285fa96886dcd2f4f499630c4388e2c1afcd7741d4ea25d73ccc2c3a69f08d",
+          "real_gpu_zmq.py": "aa1ed6f1b5ec3cb9a1416f59e0d10231d2d4401b336c8285f0ebae8c2295f370"
+        },
+        "manifest_sha256": "427ef592e5c6eb7f5c80a7e5d35bb681e4ae14461947dea5e965b68dbe0288f5"
+      },
+      "as_run_snapshots": [
+        "zmq-harness"
+      ],
+      "parallel_model_startup_seconds": 10.516274273046292
+    }
+  ],
+  "scope": "Local decoded-input and decoding-inclusive GPU/IPC measurements; exclude remote downloads, profile-table writes, signing and production publication.",
+  "warnings": [
+    "Time windows are sequential, not randomized backend crossovers.",
+    "GPU utilization is sampled every 200 ms; CUDA event durations are not pure kernel busy time.",
+    "Decode cases warm models on preloaded data; the first measured repeat also includes codec/Python cache initialization. Both all-repeat and first-excluded medians are reported.",
+    "Legacy raw-report input_decode_cpu_seconds is decoder task wall time, not CPU time; see the current input_decode_task_wall_seconds_sum field.",
+    "Nonprocessor latency includes serialization, copies, scheduling, IPC and response handling, not only transport."
+  ]
+}
