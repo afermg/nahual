@@ -169,6 +169,50 @@ included in those measurements. See the separate [real JUMP-lite GPU validation]
 for five-model inference on local raw TIFF and MQ JPEG-XL inputs, GPU utilization,
 numerical checks and scheduling experiments.
 
+### Bounded streaming across worker replicas
+
+`nahual.pipeline.process_map` overlaps input decoding with site-sharded calls.
+Start one equivalent model worker (or a complete model stack) per GPU, then pass
+its endpoints. The pipeline owns one persistent, SHM-caching client per endpoint;
+it does not launch servers, combine inference batches, or change precision.
+
+```python
+import numpy as np
+from nahual.pipeline import process_map
+
+# records is an iterator of cheap descriptors, not predecoded image arrays.
+with process_map(
+    records,
+    ["ipc:///tmp/gpu0.ipc", "ipc:///tmp/gpu1.ipc"],
+    loader=lambda record: np.load(record["path"], allow_pickle=False),
+    size_of=lambda record: record["nbytes"],  # decoded bytes, not file size
+    max_input_bytes=256 * 1024**2,
+    max_in_flight=8,
+    load_workers=4,
+    timeout_ms=120_000,
+) as results:
+    for result in results:
+        save_features(result.item["id"], result.output)
+```
+
+Results arrive as workers complete; `ordered=True` restores input order with
+bounded buffering. The count bound covers loads, requests, and buffered results.
+The optional byte budget reserves decoded input storage before loading; it is
+**not a total RSS cap**. Loader temporaries, output arrays, client SHM caches and
+consumer-retained results are additional. Loaders must return independent NumPy
+arrays and must not recycle their buffers while requests are active.
+
+Each endpoint must be a dedicated replica accepting the same inputs. Optional
+`setup_parameters={...}` configures every replica before consumption; otherwise
+existing setup is preserved. Errors stop the stream with input-index/stage
+context, without retries. Exiting the context cancels queued work, drains active
+loads/requests, and closes clients. Timeouts do not cancel server computation.
+Use a finite request timeout; arbitrary blocking loaders cannot be hard-cancelled.
+
+See the runnable [JSONL-to-NumPy example](examples/stream_arrays.py) and
+[matched real-GPU streaming validation](benchmarks/BOUNDED_PIPELINE.md).
+This API is available from Git master, not an older PyPI release.
+
 ### Optional local shared-memory data plane
 
 For a client and server on the same Linux host, NumPy process calls can opt into
