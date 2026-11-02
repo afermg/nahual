@@ -1,0 +1,188 @@
+{
+  "python": "3.12.11",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.42",
+  "packages": {
+    "numpy": "2.5.4",
+    "pynng": "0.9.0",
+    "trio": "0.35.0",
+    "pyzmq": "27.2.0"
+  },
+  "iterations": 30,
+  "warmup": 3,
+  "results": [
+    {
+      "input_bytes": 4096,
+      "output": "identity",
+      "output_bytes": 4096,
+      "wire_once": {
+        "median_ms": 0.6151,
+        "p95_ms": 0.8473
+      },
+      "shm_once": {
+        "median_ms": 1.1215,
+        "p95_ms": 1.2846
+      },
+      "wire_session": {
+        "median_ms": 0.255,
+        "p95_ms": 0.3432
+      },
+      "shm_session_uncached": {
+        "median_ms": 0.6668,
+        "p95_ms": 0.7502
+      },
+      "shm_session_cached": {
+        "median_ms": 0.5096,
+        "p95_ms": 0.6432
+      },
+      "zmq_multipart_session": {
+        "median_ms": 0.2075,
+        "p95_ms": 0.2294
+      }
+    },
+    {
+      "input_bytes": 1048576,
+      "output": "identity",
+      "output_bytes": 1048576,
+      "wire_once": {
+        "median_ms": 6.5483,
+        "p95_ms": 8.0343
+      },
+      "shm_once": {
+        "median_ms": 2.9281,
+        "p95_ms": 3.1943
+      },
+      "wire_session": {
+        "median_ms": 5.6359,
+        "p95_ms": 7.4128
+      },
+      "shm_session_uncached": {
+        "median_ms": 2.3649,
+        "p95_ms": 2.7672
+      },
+      "shm_session_cached": {
+        "median_ms": 0.6668,
+        "p95_ms": 0.9498
+      },
+      "zmq_multipart_session": {
+        "median_ms": 0.5801,
+        "p95_ms": 0.6172
+      }
+    },
+    {
+      "input_bytes": 16777216,
+      "output": "identity",
+      "output_bytes": 16777216,
+      "wire_once": {
+        "median_ms": 88.0757,
+        "p95_ms": 105.8564
+      },
+      "shm_once": {
+        "median_ms": 12.0385,
+        "p95_ms": 12.2207
+      },
+      "wire_session": {
+        "median_ms": 55.2464,
+        "p95_ms": 79.1393
+      },
+      "shm_session_uncached": {
+        "median_ms": 11.8304,
+        "p95_ms": 11.9505
+      },
+      "shm_session_cached": {
+        "median_ms": 1.3373,
+        "p95_ms": 1.526
+      },
+      "zmq_multipart_session": {
+        "median_ms": 5.545,
+        "p95_ms": 11.0639
+      }
+    },
+    {
+      "input_bytes": 4096,
+      "output": "embedding",
+      "output_bytes": 4096,
+      "wire_once": {
+        "median_ms": 0.7249,
+        "p95_ms": 0.8448
+      },
+      "shm_once": {
+        "median_ms": 1.1835,
+        "p95_ms": 1.4211
+      },
+      "wire_session": {
+        "median_ms": 0.3847,
+        "p95_ms": 0.5039
+      },
+      "shm_session_uncached": {
+        "median_ms": 0.7803,
+        "p95_ms": 0.975
+      },
+      "shm_session_cached": {
+        "median_ms": 0.6842,
+        "p95_ms": 0.8496
+      },
+      "zmq_multipart_session": {
+        "median_ms": 0.2221,
+        "p95_ms": 0.2711
+      }
+    },
+    {
+      "input_bytes": 1048576,
+      "output": "embedding",
+      "output_bytes": 4096,
+      "wire_once": {
+        "median_ms": 2.4001,
+        "p95_ms": 2.7395
+      },
+      "shm_once": {
+        "median_ms": 3.0805,
+        "p95_ms": 3.2617
+      },
+      "wire_session": {
+        "median_ms": 2.0998,
+        "p95_ms": 2.7261
+      },
+      "shm_session_uncached": {
+        "median_ms": 2.804,
+        "p95_ms": 2.9864
+      },
+      "shm_session_cached": {
+        "median_ms": 0.8422,
+        "p95_ms": 1.0912
+      },
+      "zmq_multipart_session": {
+        "median_ms": 0.4859,
+        "p95_ms": 0.5334
+      }
+    },
+    {
+      "input_bytes": 16777216,
+      "output": "embedding",
+      "output_bytes": 4096,
+      "wire_once": {
+        "median_ms": 41.3245,
+        "p95_ms": 50.4313
+      },
+      "shm_once": {
+        "median_ms": 12.0422,
+        "p95_ms": 12.3966
+      },
+      "wire_session": {
+        "median_ms": 34.9518,
+        "p95_ms": 58.9832
+      },
+      "shm_session_uncached": {
+        "median_ms": 11.5553,
+        "p95_ms": 12.6541
+      },
+      "shm_session_cached": {
+        "median_ms": 1.161,
+        "p95_ms": 1.2623
+      },
+      "zmq_multipart_session": {
+        "median_ms": 3.773,
+        "p95_ms": 5.6002
+      }
+    }
+  ]
+}
