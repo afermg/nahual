@@ -24,7 +24,7 @@ from pathlib import Path
 
 import numpy as np
 import tifffile
-from real_gpu_contract import expected_output_shape, full_stack_reference
+from benchmarks.real_gpu_contract import expected_output_shape, full_stack_reference
 
 from nahual import process as protocol
 
@@ -81,7 +81,7 @@ def inventory():
 
 def callables(address, mode, cache_bytes):
     if mode == "zmq_session":
-        from real_gpu_zmq import Session
+        from benchmarks.real_gpu_zmq import Session
 
         client = Session(address)
         return client.setup, client.process, client.close
@@ -269,7 +269,8 @@ def main():
                     command = [
                         sys.executable,
                         "-B",
-                        str(Path(__file__).with_name("real_gpu_worker.py")),
+                        "-m",
+                        "benchmarks.real_gpu_worker",
                         "--slot",
                         slot,
                         "--backend",

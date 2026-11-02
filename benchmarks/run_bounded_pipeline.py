@@ -25,7 +25,7 @@ import numpy as np
 
 from nahual.pipeline import process_map
 from nahual.process import Client
-from real_gpu_contract import expected_output_shape, full_stack_reference
+from benchmarks.real_gpu_contract import expected_output_shape, full_stack_reference
 
 
 def historical_canaries(records, reference):
@@ -199,7 +199,7 @@ def run_pass(kind, records, addresses, output, loader, options, phase):
 
 
 def main():
-    from run_real_gpu import inventory, sha
+    from benchmarks.run_real_gpu import inventory, sha
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", type=Path, required=True)
@@ -314,7 +314,8 @@ def main():
                     [
                         sys.executable,
                         "-B",
-                        str(Path(__file__).with_name("real_gpu_worker.py")),
+                        "-m",
+                        "benchmarks.real_gpu_worker",
                         "--slot",
                         "full_stack",
                         "--address",

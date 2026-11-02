@@ -2,18 +2,13 @@ from __future__ import annotations
 
 import json
 from collections import Counter
-from pathlib import Path
+from importlib.resources import files
 
-ROOT = (
-    Path(__file__).resolve().parents[1]
-    / "benchmarks"
-    / "results"
-    / "jump_lite_20261102"
-)
+RESULTS = files("benchmarks").joinpath("results", "jump_lite_20261102")
 
 
 def test_committed_results_close_accounting_and_keep_rejections():
-    result = json.loads((ROOT / "summary.json").read_text())
+    result = json.loads((RESULTS / "summary.json").read_text())
     complete = [run for run in result["runs"] if run["status"] == "complete"]
     rejected = [run for run in result["runs"] if run["status"] == "failed"]
     assert len(complete) == result["completed_configurations"] == 14
@@ -45,7 +40,7 @@ def test_committed_results_close_accounting_and_keep_rejections():
 
 
 def test_raw_and_mq_cohorts_are_matched_but_not_conflated():
-    cohorts = json.loads((ROOT / "cohorts.json").read_text())
+    cohorts = json.loads((RESULTS / "cohorts.json").read_text())
     raw, mq = [cohort["records"] for cohort in cohorts]
     assert len(raw) == len(mq) == 64
     assert len({row["site"] for row in raw}) == 64

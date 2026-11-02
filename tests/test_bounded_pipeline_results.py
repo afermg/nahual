@@ -1,76 +1,42 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-import importlib.util
 import json
-from pathlib import Path
-import statistics
 
 import pytest
 
-ROOT = Path(__file__).resolve().parents[1]
-spec = importlib.util.spec_from_file_location(
-    "bounded_summary", ROOT / "benchmarks/summarize_bounded_pipeline.py"
-)
-summary = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(summary)
+from benchmarks import summarize_bounded_pipeline as summary
+from benchmarks.run_bounded_pipeline import historical_canaries
 
 
-def test_recorded_results_accounting():
-    report = json.loads(
-        (ROOT / "benchmarks/results/bounded_pipeline_20261102/summary.json").read_text()
-    )
-    assert len(report["runs"]) == 2
-    for run in report["runs"]:
-        assert run["validation"] == dict(
-            historical=18,
-            streamed_sites=64,
-            passed=82,
-            exact=82,
-            maximum_absolute_difference=0.0,
-        )
-        assert run["recipe_files_verified"] == 87
-        assert run["config"]["gpu_indices"] == [1, 2, 3]
-        assert len(run["workers"]) == 3
-        assert all(len(worker["loaded_state_sha256"]) == 5 for worker in run["workers"])
-        assert len(run["phases"]) == 10
-        for phase in run["phases"]:
-            assert phase["sites"] == 64
-            assert phase["sites_per_second"] == pytest.approx(64 / phase["seconds"])
-            if phase["kind"] == "bounded":
-                stats = phase["stats"]
-                assert stats["peak_in_flight"] <= 12
-                assert stats["peak_reserved_input_bytes"] <= 256 * 1024**2
-                assert (
-                    stats["yielded"]
-                    == stats["processed"]
-                    == stats["loaded"]
-                    == stats["admitted"]
-                    == 64
+@pytest.fixture
+def run(tmp_path):
+    """Small synthetic run, independent of scientific data or a particular host."""
+    epoch = datetime(2026, 1, 1, 20, 0, 0, tzinfo=timezone.utc).timestamp()
+    phases = []
+    telemetry = []
+    for kind, rates in [("no_prefetch", [10, 30, 20]), ("bounded", [20, 60, 40])]:
+        for rate in rates:
+            start = epoch + 2 * len(phases)
+            phases.append(
+                dict(
+                    kind=kind,
+                    sites_per_second=rate,
+                    start_unix=start,
+                    end_unix=start + 1,
                 )
-                assert stats["in_flight"] == stats["reserved_input_bytes"] == 0
-        for kind, evidence in run["kinds"].items():
-            rates = [
-                phase["sites_per_second"]
-                for phase in run["phases"]
-                if phase["kind"] == kind
-            ]
-            assert evidence["median_sites_per_second"] == statistics.median(rates)
-            assert all(gpu["samples"] > 0 for gpu in evidence["gpus"].values())
-
-
-def test_summary_timezone_and_validation_gate(tmp_path):
-    epoch = datetime(2026, 11, 2, 20, 0, 0, tzinfo=timezone.utc).timestamp()
-    validation = dict(passed=True, exact=True, max_abs=0.0)
+            )
+            stamp = datetime.fromtimestamp(start + 0.5 - 18000, timezone.utc).strftime(
+                "%Y/%m/%d %H:%M:%S.%f"
+            )
+            for gpu in [1, 2]:
+                telemetry.append(f"{stamp}, {gpu}, GPU-{gpu}, {40 + gpu}, 1024, 100\n")
     report = dict(
         status="ok",
-        config={"gpu_indices": [1]},
-        historical_validation=[validation],
-        stream_validation=[validation],
-        phases=[
-            dict(kind=kind, sites_per_second=rate, start_unix=epoch, end_unix=epoch + 1)
-            for kind, rate in [("no_prefetch", 10), ("bounded", 16)]
-        ],
+        config={"gpu_indices": [1, 2]},
+        historical_validation=[dict(passed=True, exact=True, max_abs=0.0)],
+        stream_validation=[dict(passed=True, exact=False, max_abs=1e-6)],
+        phases=phases,
         recipe_files_verified=1,
         workers=[],
         manifest_sha256="manifest",
@@ -78,48 +44,71 @@ def test_summary_timezone_and_validation_gate(tmp_path):
         files_sha256={},
     )
     (tmp_path / "report.json").write_text(json.dumps(report))
-    (tmp_path / "gpu.csv").write_text(
-        "2026/11/02 15:00:00.500, 1, GPU-id, 80, 4275, 150\n"
+    (tmp_path / "gpu.csv").write_text("".join(telemetry))
+    return tmp_path
+
+
+def test_summary_medians_counts_and_gpu_windows(run):
+    result = summary.summarize(run, -18000)
+    assert result["ratio_of_medians"] == 2.0
+    assert result["kinds"]["no_prefetch"]["median_sites_per_second"] == 20
+    assert result["kinds"]["bounded"]["median_sites_per_second"] == 40
+    assert result["validation"] == dict(
+        historical=1,
+        streamed_sites=1,
+        passed=2,
+        exact=1,
+        maximum_absolute_difference=1e-6,
     )
-    result = summary.summarize(tmp_path, -18000)
-    assert result["ratio_of_medians"] == 1.6
-    assert result["kinds"]["bounded"]["gpus"]["1"]["mean_utilization_percent"] == 80
+    for kind in result["kinds"].values():
+        assert kind["repeats"] == 3
+        assert kind["gpus"] == {
+            str(gpu): dict(
+                samples=3,
+                mean_utilization_percent=40 + gpu,
+                peak_device_memory_mib=1024,
+            )
+            for gpu in [1, 2]
+        }
+    assert len(result["report_sha256"]) == 64
+
+
+def test_summary_requires_explicit_matching_timezone(run):
     with pytest.raises(ValueError, match="no telemetry"):
-        summary.summarize(tmp_path, 0)
-    report["status"] = "failed"
-    (tmp_path / "report.json").write_text(json.dumps(report))
-    with pytest.raises(ValueError, match="failed/incomplete"):
-        summary.summarize(tmp_path, -18000)
-    report["status"] = "ok"
-    report["stream_validation"][0]["passed"] = False
-    (tmp_path / "report.json").write_text(json.dumps(report))
-    with pytest.raises(ValueError, match="parity"):
-        summary.summarize(tmp_path, -18000)
-    report["stream_validation"][0]["passed"] = True
-    report["historical_validation"] = []
-    (tmp_path / "report.json").write_text(json.dumps(report))
-    with pytest.raises(ValueError, match="parity"):
-        summary.summarize(tmp_path, -18000)
+        summary.summarize(run, 0)
 
 
-def test_historical_reference_coverage(monkeypatch):
-    monkeypatch.syspath_prepend(str(ROOT / "benchmarks"))
-    runner_spec = importlib.util.spec_from_file_location(
-        "bounded_runner_test", ROOT / "benchmarks/run_bounded_pipeline.py"
-    )
-    runner = importlib.util.module_from_spec(runner_spec)
-    runner_spec.loader.exec_module(runner)
+@pytest.mark.parametrize(
+    "failure", ["failed", "parity", "missing_history", "missing_stream"]
+)
+def test_summary_rejects_incomplete_evidence(run, failure):
+    path = run / "report.json"
+    report = json.loads(path.read_text())
+    if failure == "failed":
+        report["status"] = "failed"
+    elif failure == "parity":
+        report["stream_validation"][0]["passed"] = False
+    elif failure == "missing_history":
+        report["historical_validation"] = []
+    else:
+        report["stream_validation"] = []
+    path.write_text(json.dumps(report))
+    with pytest.raises(ValueError, match="failed/incomplete|parity"):
+        summary.summarize(run, -18000)
+
+
+def test_historical_reference_coverage():
     records = [dict(ordinal=i, shape=[5, 224 * (i + 1), 224]) for i in range(2)]
     complete = {
         f"{i:03d}__{slot}": None
         for i in range(2)
         for slot in ("dino_pair", "morphem", "openphenom", "subcell")
     }
-    assert runner.historical_canaries(records, complete) == records
+    assert historical_canaries(records, complete) == records
     for reference in [
         {},
         {key: value for key, value in complete.items() if key.startswith("000")},
         {key: value for key, value in complete.items() if key != "001__morphem"},
     ]:
         with pytest.raises(ValueError, match="historical"):
-            runner.historical_canaries(records, reference)
+            historical_canaries(records, reference)

@@ -68,7 +68,9 @@ production recovery checkpoints. No automatic resume or overwrite is provided.
 
 ## Matched local-data validation: 2026-11-02
 
-Evidence: [`results/bounded_pipeline_20261102/summary.json`](results/bounded_pipeline_20261102/summary.json).
+Evidence: [archived summary at the measured revision](https://github.com/afermg/nahual/blob/63bab1e069870f4e7d5031b3fdfc7e7c7f1d36cd/benchmarks/results/bounded_pipeline_20261102/summary.json).
+Dated run artifacts are not test fixtures; keep new results in external scratch
+storage. Unit tests use small synthetic inputs instead.
 Full scratch evidence: `/work/scratch/amunoz/nahual-bounded-pipeline-20261102/`.
 Exact benchmark/library sources are archived in its `as-run-source/` directory.
 The final harness additionally rejects incomplete historical-reference coverage;
@@ -135,13 +137,13 @@ inputs rather than treating prefetch as a universal speedup.
 
 ### Reproduce on the recorded site
 
-Use the same frozen scientific runtime/PYTHONPATH described in
+Run from the repository root. Use the same frozen scientific runtime/PYTHONPATH described in
 `launch_real_gpu.sh`, but invoke `run_bounded_pipeline.py` directly. It refuses
 occupied selected GPUs and existing output directories; its site-specific
 output guard requires `/work/scratch/amunoz/`. It never stops other jobs.
 
 ```bash
-python -B benchmarks/run_bounded_pipeline.py \
+python -B -m benchmarks.run_bounded_pipeline \
   --manifest "$PRIOR/inputs-mq-v2/manifest.json" \
   --reference "$PRIOR/mq-baseline/validation-outputs.npz" \
   --recipe-root "$RECIPE" --decode zarr_mq --gpu-indices 1 2 3 \
@@ -154,7 +156,7 @@ is also supported for reading the frozen `.npy` inputs. The optional scientific
 packages are not required by the core library or generic example.
 
 ```bash
-python benchmarks/summarize_bounded_pipeline.py RUN_TIFF RUN_MQ \
+python -m benchmarks.summarize_bounded_pipeline RUN_TIFF RUN_MQ \
   --gpu-utc-offset-seconds -18000 --output new-summary.json
 ```
 

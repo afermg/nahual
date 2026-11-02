@@ -1,16 +1,23 @@
 # Transport benchmarks
 
-Run from a checkout with NumPy, pynng and trio installed:
+Run from the repository root with NumPy, pynng and trio installed. Benchmark
+modules are checkout-only developer tools, not part of the installed Nahual
+library. Use `python -m benchmarks.<name>` for their CLI entry points.
+Keep new run artifacts in external scratch storage (or the ignored
+`benchmarks/results/` directory); tests should use synthetic fixtures, not dated
+machine-specific measurements.
+
+For example:
 
 ```bash
-PYTHONPATH=src python benchmarks/transport.py --iterations 30 > results.json
+PYTHONPATH=src python -m benchmarks.transport --iterations 30 > /tmp/nahual-results.json
 ```
 
 To include an **experimental, benchmark-only** alternative:
 
 ```bash
 pip install pyzmq
-PYTHONPATH=src python benchmarks/transport.py --zmq --iterations 30 > results.json
+PYTHONPATH=src python -m benchmarks.transport --zmq --iterations 30 > /tmp/nahual-zmq-results.json
 ```
 
 No production backend or dependency changes are made. The PyZMQ prototype uses

@@ -1,25 +1,25 @@
 from __future__ import annotations
 
 import gc
-import importlib.util
 import json
 import subprocess
 import sys
-from pathlib import Path
 
 import numpy
 import pytest
+
+from benchmarks import transport as module
 
 
 @pytest.mark.timeout(30)
 @pytest.mark.parametrize("zmq", [False, True])
 def test_transport_benchmark_smoke(zmq):
-    if zmq and importlib.util.find_spec("zmq") is None:
-        pytest.skip("PyZMQ is an optional benchmark dependency")
-    script = Path(__file__).resolve().parents[1] / "benchmarks" / "transport.py"
+    if zmq:
+        pytest.importorskip("zmq")
     command = [
         sys.executable,
-        str(script),
+        "-m",
+        "benchmarks.transport",
         "--sizes",
         "4096",
         "--iterations",
@@ -43,10 +43,6 @@ def test_transport_benchmark_smoke(zmq):
 @pytest.mark.timeout(30)
 def test_zmq_zero_copy_result_retains_its_owner_after_next_call_and_close(tmp_path):
     pytest.importorskip("zmq")
-    script = Path(__file__).resolve().parents[1] / "benchmarks" / "transport.py"
-    spec = importlib.util.spec_from_file_location("transport_benchmark", script)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
     source = numpy.arange(262144, dtype=numpy.float32).reshape(256, 1024)
     expected = source.copy()
     with module.server("zmq", "identity", tmp_path) as address:

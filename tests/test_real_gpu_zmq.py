@@ -1,12 +1,9 @@
 from __future__ import annotations
 
 import gc
-import importlib.util
-import os
 import select
 import subprocess
 import sys
-from pathlib import Path
 
 import numpy as np
 import pytest
@@ -15,16 +12,12 @@ import pytest
 @pytest.mark.timeout(30)
 def test_benchmark_zmq_setup_lifetime_error_and_recovery(tmp_path):
     pytest.importorskip("zmq")
-    directory = Path(__file__).resolve().parents[1] / "benchmarks"
-    spec = importlib.util.spec_from_file_location(
-        "real_gpu_zmq_test", directory / "real_gpu_zmq.py"
-    )
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    from benchmarks import real_gpu_zmq as module
+
     address = f"ipc://{tmp_path}/benchmark.ipc"
     code = """
 import sys
-from real_gpu_zmq import serve
+from benchmarks.real_gpu_zmq import serve
 state = {"fail": False, "offset": 0}
 def processor(array):
     if state["fail"]:
@@ -35,16 +28,11 @@ def setup(**parameters):
     return processor, state.copy()
 serve(sys.argv[1], setup, processor, lambda: print("READY", flush=True))
 """
-    environment = os.environ.copy()
-    environment["PYTHONPATH"] = (
-        str(directory) + os.pathsep + environment.get("PYTHONPATH", "")
-    )
     server = subprocess.Popen(
         [sys.executable, "-u", "-c", code, address],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
-        env=environment,
     )
     client = None
     try:
