@@ -21,7 +21,7 @@ import pynng
 import pytest
 import trio
 
-from nahual.process import dispatch_setup_process
+from nahual.process import Client, dispatch_setup_process
 from nahual.server import responder
 
 
@@ -45,7 +45,8 @@ def _make_setup():
 
 
 @pytest.mark.timeout(15)
-def test_setup_can_be_recalled_with_new_params():
+@pytest.mark.parametrize("persistent", [False, True])
+def test_setup_can_be_recalled_with_new_params(persistent):
     # Unique IPC path per test run.
     tmpdir = tempfile.mkdtemp(prefix="nahual_test_")
     address = f"ipc://{os.path.join(tmpdir, 'reload.ipc')}"
@@ -54,6 +55,15 @@ def test_setup_can_be_recalled_with_new_params():
     client_setup, client_process = dispatch_setup_process(
         "test", signature=("dict", "numpy")
     )
+
+    client = Client(address)
+    if persistent:
+        # Keep the same call signatures below while exercising a single socket.
+        def client_setup(data, address):
+            return client.setup(data)
+
+        def client_process(data, address):
+            return client.process(data)
 
     results = {}
 
@@ -94,7 +104,10 @@ def test_setup_can_be_recalled_with_new_params():
                 nursery.start_soon(server_task, sock)
                 nursery.start_soon(client_task, nursery.cancel_scope)
 
-    trio.run(main)
+    try:
+        trio.run(main)
+    finally:
+        client.close()
 
     assert results["info_a"] == {"tag": "A", "offset": ord("A")}
     assert results["info_b"] == {"tag": "B", "offset": ord("B")}

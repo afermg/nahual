@@ -394,11 +394,14 @@ def _send_shared_request(
     address: str,
     output_mode: str,
     timeout_ms: int | None,
+    requester: Callable | None = None,
 ) -> numpy.ndarray:
     token = secrets.token_hex(16)
     descriptor = _request_descriptor(array, segment, token, output_mode)
     packet = REQUEST_MAGIC + _encode_descriptor(descriptor)
-    response = request_receive(packet, address=address, timeout_ms=timeout_ms)
+    if requester is None:
+        requester = request_receive
+    response = requester(packet, address=address, timeout_ms=timeout_ms)
     if response.startswith(_RESPONSE_PREFIX):
         if output_mode != "reuse":
             raise SharedMemoryProtocolError(
@@ -416,7 +419,10 @@ def _send_shared_request(
 
 
 def _client_numpy(
-    array: numpy.ndarray, address: str, timeout_ms: int | None
+    array: numpy.ndarray,
+    address: str,
+    timeout_ms: int | None,
+    requester: Callable | None = None,
 ) -> numpy.ndarray:
     _dtype_string(array.dtype)
     capacity = array.nbytes
@@ -428,7 +434,9 @@ def _client_numpy(
             array.shape, dtype=array.dtype, buffer=segment.buf, order="C"
         )
         numpy.copyto(staged, array)
-        return _send_shared_request(array, segment, address, "reuse", timeout_ms)
+        return _send_shared_request(
+            array, segment, address, "reuse", timeout_ms, requester
+        )
     except BaseException as error:
         primary_error = error
         raise
@@ -466,7 +474,12 @@ def _require_appose_ndarray(value: Any):
     return value
 
 
-def _client_appose(value: Any, address: str, timeout_ms: int | None) -> numpy.ndarray:
+def _client_appose(
+    value: Any,
+    address: str,
+    timeout_ms: int | None,
+    requester: Callable | None = None,
+) -> numpy.ndarray:
     array = _require_appose_ndarray(value)
     if timeout_ms != -1:
         raise ValueError(
@@ -485,21 +498,26 @@ def _client_appose(value: Any, address: str, timeout_ms: int | None) -> numpy.nd
 
     # The caller owns this allocation. Nahual only borrows it synchronously:
     # no staging, close, unlink, disposal, or server-side output overwrite.
-    return _send_shared_request(view, array.shm, address, "serialized", timeout_ms)
+    return _send_shared_request(
+        view, array.shm, address, "serialized", timeout_ms, requester
+    )
 
 
 def client_process(
-    value: Any, address: str, timeout_ms: int | None = None
+    value: Any,
+    address: str,
+    timeout_ms: int | None = None,
+    requester: Callable | None = None,
 ) -> numpy.ndarray:
     """Execute one local process call through the shared-memory data plane."""
     require_ipc_address(address)
     if isinstance(value, numpy.ndarray):
-        return _client_numpy(value, address, timeout_ms)
+        return _client_numpy(value, address, timeout_ms, requester)
     if isinstance(value, (dict, list, tuple)):
         raise TypeError(
             "shared_memory=True requires a NumPy ndarray or appose.NDArray input"
         )
-    return _client_appose(value, address, timeout_ms)
+    return _client_appose(value, address, timeout_ms, requester)
 
 
 def _eligible_output(result: numpy.ndarray, capacity: int) -> bool:
