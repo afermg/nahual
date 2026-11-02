@@ -1,5 +1,7 @@
 """Collects the behaviour of data type serialization and deserialization."""
 
+from __future__ import annotations
+
 import json
 from functools import partial
 from typing import Any, Callable, Literal
