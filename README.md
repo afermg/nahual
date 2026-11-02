@@ -151,6 +151,17 @@ Requests are not automatically retried, and a timeout **does not cancel** work
 already running on the server. Server-reported errors leave the completed
 connection available for the next call. The default stateless API is unchanged.
 
+For `client.process(data, shared_memory=True)`, NumPy staging buffers are
+cached by exact byte size after successful calls. The cache retains at most
+64 MiB and eight idle segments per client; set
+`Client(address, shared_memory_cache_bytes=0)` to disable it, or pass a different
+byte budget. This bounds retained idle memory, not peak memory during a call.
+Outputs are still independent owning arrays. Failed, timed-out, interrupted,
+or malformed calls discard their buffer rather than reusing memory the server
+might still access. `close()` unlinks all cached segments. Appose-owned inputs
+are never cached or overwritten. Existing servers and the shared-memory v1
+protocol work unchanged.
+
 ### Optional local shared-memory data plane
 
 For a client and server on the same Linux host, NumPy process calls can opt into
