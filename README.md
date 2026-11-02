@@ -162,6 +162,11 @@ might still access. `close()` unlinks all cached segments. Appose-owned inputs
 are never cached or overwritten. Existing servers and the shared-memory v1
 protocol work unchanged.
 
+For repeatable transport measurements, see [`benchmarks/README.md`](benchmarks/README.md).
+The harness includes an optional PyZMQ multipart prototype for comparison; it
+is not a supported Nahual backend. No model inference or GPU transfers are
+included in those measurements.
+
 ### Optional local shared-memory data plane
 
 For a client and server on the same Linux host, NumPy process calls can opt into

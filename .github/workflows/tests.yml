@@ -22,3 +22,8 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: python -m pip install '.[appose]' pytest pytest-timeout trio
       - run: python -m pytest -q
+      - name: Optional PyZMQ prototype smoke tests
+        if: matrix.python == '3.11'
+        run: |
+          python -m pip install pyzmq
+          python -m pytest -q tests/test_transport_benchmark.py
