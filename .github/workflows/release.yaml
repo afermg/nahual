@@ -1,0 +1,89 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions: {}
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  tests:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/tests.yml
+
+  build:
+    name: Build and validate distributions
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884
+        with:
+          python-version: '3.11'
+          enable-cache: false
+      - run: uv build
+      - name: Check metadata and release version
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          uvx twine check --strict dist/*
+          python - <<'PY'
+          from email.parser import BytesParser
+          import os
+          from pathlib import Path
+          import tarfile
+          import zipfile
+
+          tag = os.environ["RELEASE_TAG"]
+          if not tag.startswith("v"):
+              raise SystemExit("Release tags must start with v")
+          wheels = list(Path("dist").glob("*.whl"))
+          sdists = list(Path("dist").glob("*.tar.gz"))
+          if len(wheels) != 1 or len(sdists) != 1:
+              raise SystemExit("Expected one wheel and one source distribution")
+          with zipfile.ZipFile(wheels[0]) as archive:
+              metadata_path, = [name for name in archive.namelist() if name.endswith(".dist-info/METADATA")]
+              wheel_metadata = BytesParser().parsebytes(archive.read(metadata_path))
+          with tarfile.open(sdists[0]) as archive:
+              metadata_path, = [member for member in archive.getmembers() if member.name.endswith("/PKG-INFO")]
+              sdist_metadata = BytesParser().parsebytes(archive.extractfile(metadata_path).read())
+          for metadata in (wheel_metadata, sdist_metadata):
+              if metadata["Name"] != "nahual" or metadata["Version"] != tag[1:]:
+                  raise SystemExit("Package name/version does not match the release tag")
+          PY
+      - name: Smoke test the installed wheel
+        run: |
+          uv venv /tmp/nahual-release-smoke
+          uv pip install --python /tmp/nahual-release-smoke/bin/python dist/*.whl
+          /tmp/nahual-release-smoke/bin/python -I -c 'from nahual.process import Client; from nahual.pipeline import process_map; from nahual._version import __version__; print(__version__)'
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: python-distributions
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    name: Publish to PyPI
+    needs: [tests, build]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/nahual
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: python-distributions
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086
