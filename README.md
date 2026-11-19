@@ -211,7 +211,7 @@ Use a finite request timeout; arbitrary blocking loaders cannot be hard-cancelle
 
 See the runnable [JSONL-to-NumPy example](examples/stream_arrays.py) and
 [bounded-streaming guide](benchmarks/BOUNDED_PIPELINE.md).
-This API requires Nahual 0.0.11 or newer.
+This API requires Nahual 0.0.12 or newer.
 
 ### Optional local shared-memory data plane
 

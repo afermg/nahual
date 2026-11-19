@@ -14,7 +14,7 @@ it can require reviewer approval before publication. No PyPI API token is needed
 ## Release procedure
 
 1. Ensure the intended release commit is on `master` and its tests pass.
-2. Tag that commit with a new version, such as `v0.0.11`, and push the tag.
+2. Tag that commit with a new version, such as `v0.0.12`, and push the tag.
 3. Create and publish a GitHub Release for that tag with release notes.
 4. Check the Release workflow and verify the new version on PyPI.
 
@@ -23,6 +23,10 @@ source distribution and wheel, checks their metadata against the release tag,
 and smoke-tests the installed wheel. A separate job downloads those artifacts
 and publishes them only after tests and build checks succeed. Only that job has
 OIDC token permissions, and it runs in the `pypi` environment.
+
+The test matrix pins Ubuntu 24.04 because GitHub's Ubuntu 26.04 Python toolcache
+does not provide Python 3.9. Check all supported Python versions before updating
+the runner image.
 
 For local builds, use a full Git checkout with tags and run `uv build`; the wheel
 is rebuilt from the source distribution. Builds between tags have development
