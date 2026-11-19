@@ -1,15 +1,14 @@
 # Bounded decode/inference/output streaming
 
-`nahual.pipeline.process_map` makes the previously benchmarked scheduling pattern
-reusable: one persistent NNG client with a bounded SHM cache per endpoint, site
+`nahual.pipeline.process_map` provides bounded streaming: one persistent NNG client with a bounded SHM cache per endpoint, site
 assignment to available replicas, bounded concurrent loading, and incremental
 result consumption. It has no Torch, TIFF, Zarr or other new runtime dependency.
 
 It does **not** deploy models, select GPUs, merge inference batches, change
 precision, retry failed sites, or resume scientific campaigns. An endpoint must
-already host an equivalent independent worker. For JUMP-lite, the tested layout
-is the complete five-model stack on each GPU, not different models at different
-endpoints. Do not point this scheduler at heterogeneous single-model endpoints.
+already host an equivalent independent worker. Replicate the same model or
+complete model stack at every endpoint. Do not point this scheduler at
+heterogeneous single-model endpoints.
 
 ## Runnable generic example
 
@@ -66,102 +65,10 @@ production recovery checkpoints. No automatic resume or overwrite is provided.
 - Consume/close on the creating thread and process. Existing stateless helpers,
   `Client`, server wrappers and wire protocols are unchanged.
 
-## Matched local-data validation: 2026-11-02
+## Single-worker use
 
-Evidence: [archived summary at the measured revision](https://github.com/afermg/nahual/blob/63bab1e069870f4e7d5031b3fdfc7e7c7f1d36cd/benchmarks/results/bounded_pipeline_20261102/summary.json).
-Dated run artifacts are not test fixtures; keep new results in external scratch
-storage. Unit tests use small synthetic inputs instead.
-Full scratch evidence: `/work/scratch/amunoz/nahual-bounded-pipeline-20261102/`.
-Exact benchmark/library sources are archived in its `as-run-source/` directory.
-The final harness additionally rejects incomplete historical-reference coverage;
-that guard was checked against both real reference files after timing. The core
-pipeline and inference code are byte-identical to the measured versions.
-
-Same 64 sites and six geometries as the [earlier real-GPU study](REAL_GPU.md):
-32 JUMP-lite and 32 Target-2 sites, eight sources, 33 plates. Raw TIFF and existing
-lossy MQ JPEG-XL Zarr inputs are separate, hash-bound cohorts. Each site runs
-DINOv2, checkpointed random DINOv2, MorphEM, OpenPhenom and SubCell, preserving
-frozen CUDA preprocessing and FP32/per-site inference. All 87 frozen recipe
-inventory entries and every loaded model-state hash pass.
-
-Only **GPUs 1–3** were used (H100 NVL, one full stack per GPU). GPU 0 had another
-experiment and was left untouched. No service, canonical dataset, checkpoint,
-model weight, manuscript result or historical benchmark output was modified.
-
-### Numerical validation
-
-For each codec:
-
-1. All three workers match six historical single-slot canaries (18 comparisons).
-2. Generate a seeded, per-site full-stack reference for all 64 frozen cached
-   inputs, then compare **every** decoded streaming output to its reference.
-3. All 82 comparisons are **bit-exact**, or **164/164 across both cohorts**.
-   Acceptance remains `rtol=1e-5, atol=5e-4`; no tolerance was relaxed.
-
-Seed `17012026` is used only for comparisons to control stochastic MorphEM.
-Measured phases do not reset its RNG. No merged batches, autocast or BF16.
-
-### Throughput including decoding and NumPy output writes
-
-Five matched repeats per configuration/codec, alternating execution order;
-identical shuffled site order within each pair. Baseline: three dynamically
-sharded workers, each serially decoding, inferring with pooled SHM and writing
-its output. Candidate: eight load threads, three inference workers, at most
-12 admitted sites and a 256 MiB decoded-input reservation budget. Both hash-check
-decoded inputs, check output shape/finiteness, and write uncompressed `.npy`
-outputs. Client setup is outside timing; input consumption, output writes and
-stream draining are inside. Candidate iterator teardown is included; baseline
-client teardown and both per-run JSON receipt serializations are outside timing.
-Caches start empty each pass; model weights remain loaded and warmed.
-
-| Input | No prefetch, sites/s | Bounded, sites/s | Ratio of medians |
-|---|---:|---:|---:|
-| Raw TIFF | 15.51 | 15.37 | 0.99× |
-| MQ JPEG-XL Zarr | 10.70 | 17.14 | **1.60×** |
-
-MQ mean sampled GPU utilization rises from **48–49% to 77–79%** across the three
-GPUs. TIFF utilization remains approximately 68–73%; there is **no TIFF speedup**
-in this run. Candidate peak reservations are at most **146,181,840 bytes
-(139.4 MiB)** and 12 sites, independent of total input count. All runs yield
-exactly 64 outputs and drain their queues. Twenty measured passes produced
-1,280 site outputs / 6,400 model-site outputs; validation work is additional.
-
-These short repeated windows on a shared host are descriptive, not confidence
-intervals. OS page caches are warm, output writes are not `fsync`-durable, and
-GPU utilization is sampled every 200 ms (local offset explicitly recorded as
-`-18000` seconds). Do not directly compare these three-GPU numbers with the
-previous four-GPU experiment, which used different output/timing boundaries.
-Downloads, production profile-table generation, signing and publication remain
-excluded. More decode threads do not help every codec: tune against matched
-inputs rather than treating prefetch as a universal speedup.
-
-### Reproduce on the recorded site
-
-Run from the repository root. Use the same frozen scientific runtime/PYTHONPATH described in
-`launch_real_gpu.sh`, but invoke `run_bounded_pipeline.py` directly. It refuses
-occupied selected GPUs and existing output directories; its site-specific
-output guard requires `/work/scratch/amunoz/`. It never stops other jobs.
-
-```bash
-python -B -m benchmarks.run_bounded_pipeline \
-  --manifest "$PRIOR/inputs-mq-v2/manifest.json" \
-  --reference "$PRIOR/mq-baseline/validation-outputs.npz" \
-  --recipe-root "$RECIPE" --decode zarr_mq --gpu-indices 1 2 3 \
-  --output /work/scratch/amunoz/new-bounded-mq-run
-```
-
-For TIFF use `inputs/manifest.json`,
-`baseline-before/validation-outputs.npz`, and `--decode tiff`. `--decode cache`
-is also supported for reading the frozen `.npy` inputs. The optional scientific
-packages are not required by the core library or generic example.
-
-```bash
-python -m benchmarks.summarize_bounded_pipeline RUN_TIFF RUN_MQ \
-  --gpu-utc-offset-seconds -18000 --output new-summary.json
-```
-
-The benchmark reuses `real_gpu_worker.py` and its benchmark-only packed
-full-stack framing; it is not a new production wire schema. The standalone
-runner saves separate scratch outputs and has no access to campaign checkpoint
-logic. Production adoption should be a separately versioned, explicitly
-validated deployment, not a patch to an immutable scientific recipe.
+One endpoint is supported too: concurrent loaders can prepare upcoming inputs
+while that worker processes the current request. Persistent connections and
+cached shared-memory buffers still apply. Additional loaders do not parallelize
+inference within a worker; tune prefetch limits to available host memory and
+measure your own workload.

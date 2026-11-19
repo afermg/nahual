@@ -165,9 +165,9 @@ protocol work unchanged.
 For repeatable transport measurements, see [`benchmarks/README.md`](benchmarks/README.md).
 The harness includes an optional PyZMQ multipart prototype for comparison; it
 is not a supported Nahual backend. No model inference or GPU transfers are
-included in those measurements. See the separate [real JUMP-lite GPU validation](benchmarks/REAL_GPU.md)
-for five-model inference on local raw TIFF and MQ JPEG-XL inputs, GPU utilization,
-numerical checks and scheduling experiments.
+included in those measurements. Historical GPU experiments are linked from the
+benchmark guide; their machine-specific launchers are not supported deployment
+tools.
 
 ### Bounded streaming across worker replicas
 
@@ -210,7 +210,7 @@ loads/requests, and closes clients. Timeouts do not cancel server computation.
 Use a finite request timeout; arbitrary blocking loaders cannot be hard-cancelled.
 
 See the runnable [JSONL-to-NumPy example](examples/stream_arrays.py) and
-[matched real-GPU streaming validation](benchmarks/BOUNDED_PIPELINE.md).
+[bounded-streaming guide](benchmarks/BOUNDED_PIPELINE.md).
 This API is available from Git master, not an older PyPI release.
 
 ### Optional local shared-memory data plane
